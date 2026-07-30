@@ -59,10 +59,12 @@ void IRAM_ATTR countPulse() {
 
 unsigned long lastSensorRead = 0;
 unsigned long lastFirebasePush = 0;
+unsigned long lastHistoryPush = 0;
 unsigned long lastEspNowSend = 0;
 
 const unsigned long SENSOR_INTERVAL_MS   = 1000;
 const unsigned long FIREBASE_INTERVAL_MS = 1000;
+const unsigned long HISTORY_INTERVAL_MS  = 600000; // 10 minutes
 const unsigned long ESPNOW_INTERVAL_MS   = 1000;
 
 float lastValidTemp = 25.0;
@@ -149,8 +151,20 @@ void loop() {
     liveJson.set("hum", myData.hum);
     liveJson.set("pres", myData.pres);
     liveJson.set("wind", myData.wind);
+    liveJson.set("light", 0.0);      // Add sensor or keep 0 if not wired
+    liveJson.set("rain", 0.0);       // Add sensor or keep 0 if not wired
+    liveJson.set("distance", 0.0);   // Add sensor or keep 0 if not wired
+    liveJson.set("battery", 0.0);    // Add sensor or keep 0 if not wired
+    liveJson.set("isOnline", true);
     liveJson.set("timestamp", ts);
 
+    // Live data (overwritten each cycle)
     Firebase.setJSON(fbdo, "/weather_station", liveJson);
+
+    // History log (appended every 10 min — Flutter reads last 48)
+    if (now - lastHistoryPush >= HISTORY_INTERVAL_MS) {
+      lastHistoryPush = now;
+      Firebase.pushJSON(fbdo, "/weather_history", liveJson);
+    }
   }
 }

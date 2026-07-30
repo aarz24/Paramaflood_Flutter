@@ -8,46 +8,21 @@ class AppState extends ChangeNotifier {
   final _firebase = FirebaseService();
   final _locSvc   = LocationWeatherService();
 
-  WeatherData       _live    = WeatherData(
-    temp: 24.5,
-    hum: 52.0,
-    pres: 1013.25,
-    wind: 2.4,
-    light: 850.0,
-    rain: 0.0,
-    distance: 120.0,
-    battery: 12.2,
-    timestamp: DateTime.now(),
-  );
+  WeatherData       _live    = WeatherData.empty();
   WeatherData?      _prev;
   List<WeatherData> _history = [];
   InternetWeather?  _internet;
   int               _frameCount = 0;
   String            _error      = '';
   bool              _locationLoading = true;
+  bool              _hasReceivedLiveData = false;
+  bool              _hasReceivedHistory  = false;
 
   StreamSubscription<WeatherData>?       _liveSub;
   StreamSubscription<List<WeatherData>>? _histSub;
   Timer?                                 _internetTimer;
 
-  AppState() {
-    // Pre-populate mock history so charts are fully populated on load
-    final nowTime = DateTime.now();
-    for (int i = 47; i >= 0; i--) {
-      final t = nowTime.subtract(Duration(minutes: 10 * i));
-      _history.add(WeatherData(
-        temp: 21.0 + (i % 6) * 0.8,
-        hum: 45.0 + (i % 8) * 2.5,
-        pres: 1010.0 + (i % 10) * 0.5,
-        wind: 1.2 + (i % 5) * 0.4,
-        light: 500.0 + (i % 12) * 200,
-        rain: (i % 24 == 0) ? 0.70 : 0.0,
-        distance: 150.0 - (i % 10) * 2.5,
-        battery: 12.4 - (i / 48) * 0.5,
-        timestamp: t,
-      ));
-    }
-  }
+  AppState();
 
   WeatherData       get live            => _live;
   WeatherData?      get prev            => _prev;
@@ -58,6 +33,8 @@ class AppState extends ChangeNotifier {
   String            get error           => _error;
   bool              get locationLoading => _locationLoading;
   bool              get locationDeniedForever => _locSvc.permissionDeniedForever;
+  bool              get hasReceivedLiveData => _hasReceivedLiveData;
+  bool              get hasReceivedHistory  => _hasReceivedHistory;
 
   Future<void> init() async {
     // ── Firebase live stream — updates every ~1 second ──────────
@@ -65,12 +42,14 @@ class AppState extends ChangeNotifier {
       (d) {
         _prev = _live;
         _live = d;
+        _hasReceivedLiveData = true;
         _frameCount++;
+        _error = '';
         notifyListeners();
       },
       onError: (e) {
         debugPrint('Firebase stream error (running in offline mode): $e');
-        _error = 'Firebase offline';
+        _error = 'Firebase offline – check google-services.json';
         notifyListeners();
       },
     );
@@ -80,11 +59,12 @@ class AppState extends ChangeNotifier {
       (list) {
         if (list.isNotEmpty) {
           _history = list;
+          _hasReceivedHistory = true;
           notifyListeners();
         }
       },
       onError: (e) {
-        debugPrint('Firebase history error (using offline mock data): $e');
+        debugPrint('Firebase history error: $e');
       },
     );
 
@@ -117,6 +97,8 @@ class AppState extends ChangeNotifier {
     // Update local state immediately for instant feedback
     _prev = _live;
     _live = d;
+    _hasReceivedLiveData = true;
+    _hasReceivedHistory = true;
     _frameCount++;
     _history.add(d);
     if (_history.length > 48) {

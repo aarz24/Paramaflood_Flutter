@@ -7,8 +7,8 @@ import 'package:provider/provider.dart';
 
 import '../models/weather_data.dart';
 import '../services/app_state.dart';
+import 'package:flutter/foundation.dart'; // Added for kDebugMode
 import '../services/app_theme.dart';
-import '../widgets/analytics_panel.dart';
 import '../widgets/hero_panel.dart';
 import '../widgets/sensor_card.dart';
 
@@ -50,8 +50,8 @@ class DashboardScreen extends StatelessWidget {
                   shape: BoxShape.circle,
                   gradient: RadialGradient(
                     colors: [
-                      AppTheme.heroAcc.withOpacity(0.22),
-                      AppTheme.heroAcc.withOpacity(0.0),
+                      AppTheme.colDist.withOpacity(0.22),
+                      AppTheme.colDist.withOpacity(0.0),
                     ],
                   ),
                 ),
@@ -96,6 +96,8 @@ class DashboardScreen extends StatelessWidget {
                 frameCount: state.frameCount,
                 locationLoading: state.locationLoading,
                 locationDeniedForever: state.locationDeniedForever,
+                hasReceivedLiveData: state.hasReceivedLiveData,
+                error: state.error,
               ),
               shouldRebuild: (previous, next) => previous != next,
               builder: (context, data, _) {
@@ -141,6 +143,60 @@ class DashboardScreen extends StatelessWidget {
                         ),
                       ),
                       const SliverToBoxAdapter(child: SizedBox(height: 14)),
+                      // Show waiting banner when no real data yet
+                      if (!data.hasReceivedLiveData)
+                        SliverToBoxAdapter(
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 12),
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: AppTheme.heroAcc.withOpacity(0.08),
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(color: AppTheme.heroAcc.withOpacity(0.25)),
+                            ),
+                            child: Row(
+                              children: [
+                                const SizedBox(
+                                  width: 18, height: 18,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: AppTheme.heroAcc,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        data.error.isNotEmpty
+                                            ? 'Firebase Connection Issue'
+                                            : 'Waiting for sensor data…',
+                                        style: GoogleFonts.outfit(
+                                          color: AppTheme.text,
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        data.error.isNotEmpty
+                                            ? data.error
+                                            : 'Connecting to ESP32 via Firebase Realtime Database',
+                                        style: GoogleFonts.outfit(
+                                          color: AppTheme.subtext,
+                                          fontSize: 10,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      if (!data.hasReceivedLiveData)
+                        const SliverToBoxAdapter(child: SizedBox(height: 14)),
                       SliverPadding(
                         padding: const EdgeInsets.symmetric(horizontal: 12),
                         sliver: SliverGrid(
@@ -242,54 +298,17 @@ class DashboardScreen extends StatelessWidget {
                           ),
                         ),
                       ),
-                      const SliverToBoxAdapter(child: SizedBox(height: 14)),
-                      const SliverToBoxAdapter(
-                        child: _SectionLabel(
-                          title: 'TRENDING HISTORY',
-                          subtitle: 'Rolling sensor history across the last readings',
+                      const SliverToBoxAdapter(child: SizedBox(height: 28)),
+                      if (kDebugMode) ...[
+                        const SliverToBoxAdapter(
+                          child: _SectionLabel(
+                            title: 'TEST DATA',
+                            subtitle: 'Simulate extreme conditions without hardware (Debug Only)',
+                          ),
                         ),
-                      ),
-                      SliverToBoxAdapter(
-                        child: RepaintBoundary(
-                          child: HistoryChart(history: data.history)
-                              .animate()
-                              .fadeIn(delay: 240.ms),
-                        ),
-                      ),
-                      const SliverToBoxAdapter(child: SizedBox(height: 12)),
-                      const SliverToBoxAdapter(
-                        child: _SectionLabel(
-                          title: 'LIVE COMPARISON',
-                          subtitle: 'Sensor readings against Open-Meteo for context',
-                        ),
-                      ),
-                      SliverToBoxAdapter(
-                        child: ComparisonPanel(sensor: live, internet: internet)
-                            .animate()
-                            .fadeIn(delay: 280.ms),
-                      ),
-                      const SliverToBoxAdapter(child: SizedBox(height: 12)),
-                      const SliverToBoxAdapter(
-                        child: _SectionLabel(
-                          title: 'INSIGHTS',
-                          subtitle: 'Quick health checks and weather interpretation',
-                        ),
-                      ),
-                      SliverToBoxAdapter(
-                        child: WeatherAnalyticsPanel(
-                          sensor: live,
-                          internet: internet,
-                          history: data.history,
-                        ).animate().fadeIn(delay: 320.ms),
-                      ),
-                      const SliverToBoxAdapter(child: SizedBox(height: 12)),
-                      const SliverToBoxAdapter(
-                        child: _SectionLabel(
-                          title: 'TEST DATA',
-                          subtitle: 'Simulate extreme conditions without hardware',
-                        ),
-                      ),
-                      const SliverToBoxAdapter(child: _TestPanel()),
+                        const SliverToBoxAdapter(child: _TestPanel()),
+                        const SliverToBoxAdapter(child: SizedBox(height: 28)),
+                      ],
                       const SliverToBoxAdapter(child: SizedBox(height: 28)),
                     ],
                   ),
@@ -312,6 +331,8 @@ class _DashData {
   final int frameCount;
   final bool locationLoading;
   final bool locationDeniedForever;
+  final bool hasReceivedLiveData;
+  final String error;
 
   const _DashData({
     required this.live,
@@ -322,6 +343,8 @@ class _DashData {
     required this.frameCount,
     required this.locationLoading,
     required this.locationDeniedForever,
+    required this.hasReceivedLiveData,
+    required this.error,
   });
 
   @override
@@ -331,7 +354,9 @@ class _DashData {
         history.length == other.history.length &&
         internet?.fetchedAt == other.internet?.fetchedAt &&
         locationName == other.locationName &&
-        locationLoading == other.locationLoading;
+        locationLoading == other.locationLoading &&
+        hasReceivedLiveData == other.hasReceivedLiveData &&
+        error == other.error;
   }
 
   @override
@@ -341,6 +366,8 @@ class _DashData {
         internet?.fetchedAt,
         locationName,
         locationLoading,
+        hasReceivedLiveData,
+        error,
       );
 }
 
@@ -553,7 +580,7 @@ class _AppBar extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'WX STATION',
+                  'PARAMAFLOOD MONITOR',
                   style: GoogleFonts.outfit(
                     color: AppTheme.text,
                     fontSize: 18,
@@ -563,7 +590,7 @@ class _AppBar extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  'ESP32 weather dashboard · $locationName',
+                  'ESP32 flood monitoring · $locationName',
                   style: GoogleFonts.outfit(
                     color: AppTheme.subtext,
                     fontSize: 11,

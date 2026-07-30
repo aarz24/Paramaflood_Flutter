@@ -1,5 +1,5 @@
 name: wx_station
-description: ESP32 Weather Station – Professional Firebase Dashboard
+description: ParamaFlood Monitor – ESP32 IoT Flood Monitoring Dashboard
 publish_to: 'none'
 version: 2.0.0+1
 
@@ -27,6 +27,9 @@ dependencies:
 
   # HTTP for Open-Meteo (free, no key needed)
   http: ^1.2.1
+
+  # Local storage
+  shared_preferences: ^2.2.2
 
   # State
   provider: ^6.1.1

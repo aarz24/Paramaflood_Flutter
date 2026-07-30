@@ -1,6 +1,6 @@
 {
-    "name": "wx_station",
-    "short_name": "wx_station",
+    "name": "ParamaFlood Monitor",
+    "short_name": "ParamaFlood Monitor",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

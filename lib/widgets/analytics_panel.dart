@@ -278,6 +278,8 @@ class _HistoryChartState extends State<HistoryChart>
     ('WIND', AppTheme.colWind,  'm/s', '🌬'),
     ('DIST', AppTheme.colDist,  'cm',  '🌊'),
     ('BATT', AppTheme.colBatt,  'V',   '🔋'),
+    ('LIGHT', AppTheme.colLight, 'lx', '☀️'),
+    ('RAIN', AppTheme.colRain,  'mm',  '🌧'),
   ];
 
   List<double> get _vals {
@@ -288,6 +290,8 @@ class _HistoryChartState extends State<HistoryChart>
       3 => widget.history.map((e) => e.wind).toList(),
       4 => widget.history.map((e) => e.distance).toList(),
       5 => widget.history.map((e) => e.battery).toList(),
+      6 => widget.history.map((e) => e.light).toList(),
+      7 => widget.history.map((e) => e.rain).toList(),
       _ => [],
     };
   }
@@ -355,6 +359,8 @@ class _HistoryChartState extends State<HistoryChart>
                   3 => widget.history.last.wind,
                   4 => widget.history.last.distance,
                   5 => widget.history.last.battery,
+                  6 => widget.history.last.light,
+                  7 => widget.history.last.rain,
                   _ => null,
                 };
               }
