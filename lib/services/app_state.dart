@@ -2,11 +2,13 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import '../models/weather_data.dart';
 import '../services/firebase_service.dart';
+import '../services/gemini_service.dart';
 import '../services/location_weather_service.dart';
 
 class AppState extends ChangeNotifier {
   final _firebase = FirebaseService();
   final _locSvc   = LocationWeatherService();
+  final _gemini   = GeminiService();
 
   WeatherData       _live    = WeatherData.empty();
   WeatherData?      _prev;
@@ -17,6 +19,18 @@ class AppState extends ChangeNotifier {
   bool              _locationLoading = true;
   bool              _hasReceivedLiveData = false;
   bool              _hasReceivedHistory  = false;
+
+  // ── AI State ──────────────────────────────────────────────────
+  String _aiAnalysis = '';
+  String _floodRiskLevel = 'UNKNOWN'; // RENDAH, SEDANG, TINGGI, KRITIS, UNKNOWN
+  bool   _isAiLoading = false;
+  String _aiError = '';
+  bool   _isChatLoading = false;
+  String _dailyReport = '';
+  bool   _isReportLoading = false;
+  String _smartAlert = '';
+  DateTime? _lastAlertTime;
+  final List<Map<String, String>> _chatMessages = [];
 
   StreamSubscription<WeatherData>?       _liveSub;
   StreamSubscription<List<WeatherData>>? _histSub;
@@ -36,16 +50,32 @@ class AppState extends ChangeNotifier {
   bool              get hasReceivedLiveData => _hasReceivedLiveData;
   bool              get hasReceivedHistory  => _hasReceivedHistory;
 
+  // ── AI Getters ────────────────────────────────────────────────
+  String get aiAnalysis      => _aiAnalysis;
+  String get floodRiskLevel  => _floodRiskLevel;
+  bool   get isAiLoading     => _isAiLoading;
+  String get aiError         => _aiError;
+  bool   get isChatLoading   => _isChatLoading;
+  String get dailyReport     => _dailyReport;
+  bool   get isReportLoading => _isReportLoading;
+  String get smartAlert      => _smartAlert;
+  bool   get isAiConfigured  => _gemini.isConfigured;
+  List<Map<String, String>> get chatMessages => List.unmodifiable(_chatMessages);
+
   Future<void> init() async {
     // ── Firebase live stream — updates every ~1 second ──────────
     _liveSub = _firebase.liveStream.listen(
       (d) {
         _prev = _live;
         _live = d;
+        final isFirstData = !_hasReceivedLiveData;
         _hasReceivedLiveData = true;
         _frameCount++;
         _error = '';
         notifyListeners();
+        // Jalankan analisis AI pertama saat data live pertama diterima
+        if (isFirstData) refreshAiAnalysis();
+        _checkSmartAlerts(d);
       },
       onError: (e) {
         debugPrint('Firebase stream error (running in offline mode): $e');
@@ -83,6 +113,101 @@ class AppState extends ChangeNotifier {
       const Duration(minutes: 10),
       (_) => _refreshInternet(),
     );
+
+    // CATATAN KUOTA: free tier gemini-2.5-flash hanya ±20 request/HARI.
+    // Auto-refresh 15 menit (~96/hari) akan menghabiskan kuota — jadi
+    // analisis AI hanya berjalan saat data pertama masuk + refresh manual.
+    // (Timer auto-refresh sengaja dinonaktifkan.)
+  }
+
+  // ── AI Methods ────────────────────────────────────────────────
+  Future<void> refreshAiAnalysis() async {
+    if (_isAiLoading) return;
+    _isAiLoading = true;
+    _aiError = '';
+    notifyListeners();
+
+    try {
+      final res = await _gemini.analyzeWeather(
+        current: _live,
+        history: _history,
+        internet: _internet,
+      );
+      final risk = res['risk'] ?? 'UNKNOWN';
+      if (risk == 'COOLDOWN') {
+        // Masih cooldown — tampilkan pesan tunggu tanpa menimpa hasil lama
+        _aiError = res['analysis'] ?? '';
+      } else {
+        _floodRiskLevel = risk;
+        _aiAnalysis = res['analysis'] ?? 'Tidak ada analisis.';
+      }
+    } catch (e) {
+      _aiError = 'Gagal memproses AI: $e';
+    } finally {
+      _isAiLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> sendChatMessage(String text) async {
+    if (text.trim().isEmpty || _isChatLoading) return;
+
+    _chatMessages.add({'sender': 'user', 'message': text.trim()});
+    _isChatLoading = true;
+    notifyListeners();
+
+    final reply = await _gemini.chat(
+      userMessage: text.trim(),
+      current: _live,
+      history: _history,
+      internet: _internet,
+    );
+
+    _chatMessages.add({'sender': 'bot', 'message': reply});
+    _isChatLoading = false;
+    notifyListeners();
+  }
+
+  Future<void> generateDailyReport() async {
+    if (_isReportLoading) return;
+    _isReportLoading = true;
+    notifyListeners();
+
+    _dailyReport = await _gemini.generateDailyReport(todayHistory: _history);
+    _isReportLoading = false;
+    notifyListeners();
+  }
+
+  void clearSmartAlert() {
+    _smartAlert = '';
+    notifyListeners();
+  }
+
+  /// Deteksi kondisi bahaya → minta AI buat notifikasi kontekstual.
+  /// Maksimal satu alert per 30 menit — kuota free tier cuma ±20 req/hari.
+  Future<void> _checkSmartAlerts(WeatherData d) async {
+    if (_lastAlertTime != null &&
+        DateTime.now().difference(_lastAlertTime!) <
+            const Duration(minutes: 30)) {
+      return;
+    }
+
+    String? alertType;
+    if (d.distance > 0 && d.distance < 20) {
+      alertType = 'flood';
+    } else if (d.feelsLike > 40) {
+      alertType = 'heat';
+    } else if (d.battery > 0 && d.battery < 10.5) {
+      alertType = 'battery';
+    } else if (d.pres > 0 && d.pres < 990) {
+      alertType = 'storm';
+    }
+    if (alertType == null) return;
+
+    _lastAlertTime = DateTime.now();
+    _smartAlert =
+        await _gemini.generateSmartAlert(current: d, alertType: alertType);
+    notifyListeners();
   }
 
   Future<void> _refreshInternet() async {
@@ -105,6 +230,7 @@ class AppState extends ChangeNotifier {
       _history.removeAt(0);
     }
     notifyListeners();
+    _checkSmartAlerts(d);
 
     // Try to update Firebase in the background
     try {

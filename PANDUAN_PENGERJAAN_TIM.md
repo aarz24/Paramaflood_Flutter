@@ -1,7 +1,7 @@
 # 📘 Panduan Pengerjaan Teknis Super-Detail — Team Ariel & Naina
 
 > **Project:** Paramaflood IoT & Weather Monitor (AI Competition Integration)  
-> **Target:** Integrasi Gemini AI 2.0 Flash + UI Premium + Logo Branding  
+> **Target:** Integrasi Gemini AI 2.5 Flash + UI Premium + Logo Branding  
 > **Stack:** Flutter (Dart), Firebase Realtime DB, Google Generative AI (Gemini)
 
 ---
@@ -98,7 +98,7 @@ class GeminiService {
 
   GeminiService() {
     _model = GenerativeModel(
-      model: 'gemini-2.0-flash',
+      model: 'gemini-2.5-flash',
       apiKey: ApiKeys.geminiApiKey,
       generationConfig: GenerationConfig(
         temperature: 0.6,

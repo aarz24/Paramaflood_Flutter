@@ -9,6 +9,8 @@ import '../models/weather_data.dart';
 import '../services/app_state.dart';
 import 'package:flutter/foundation.dart'; // Added for kDebugMode
 import '../services/app_theme.dart';
+import '../widgets/ai_chat_panel.dart';
+import '../widgets/ai_insight_panel.dart';
 import '../widgets/hero_panel.dart';
 import '../widgets/sensor_card.dart';
 
@@ -26,6 +28,23 @@ class DashboardScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppTheme.bg,
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            backgroundColor: Colors.transparent,
+            builder: (ctx) => const AiChatPanel(),
+          );
+        },
+        icon: const Icon(Icons.smart_toy_rounded),
+        label: Text(
+          'Tanya ParaBot',
+          style: GoogleFonts.outfit(fontWeight: FontWeight.w700, fontSize: 13),
+        ),
+        backgroundColor: AppTheme.heroAcc,
+        foregroundColor: AppTheme.bg,
+      ),
       body: Stack(
         children: [
           const Positioned.fill(
@@ -140,6 +159,16 @@ class DashboardScreen extends StatelessWidget {
                             locationLoading: data.locationLoading,
                             locationDeniedForever: data.locationDeniedForever,
                           ).animate().fadeIn(duration: 400.ms),
+                        ),
+                      ),
+                      const SliverToBoxAdapter(child: SizedBox(height: 14)),
+                      // 🧠 Panel Analisis AI Gemini
+                      SliverToBoxAdapter(
+                        child: RepaintBoundary(
+                          child: const AiInsightPanel()
+                              .animate()
+                              .fadeIn(delay: 60.ms)
+                              .slideY(begin: 0.1),
                         ),
                       ),
                       const SliverToBoxAdapter(child: SizedBox(height: 14)),

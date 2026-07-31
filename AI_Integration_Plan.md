@@ -94,7 +94,7 @@ Gemini jawab:
 | **Gratis** | Free tier cukup untuk proyek kita (1.500 request/hari) |
 | **Mudah** | Ada package Flutter resmi (`google_generative_ai`) |
 | **Google** | Cocok sama ecosystem kita (Firebase + Flutter = Google juga) |
-| **Cepat** | Model `gemini-2.0-flash` responsnya < 2 detik |
+| **Cepat** | Model `gemini-2.5-flash` responsnya < 2 detik |
 
 ---
 
@@ -285,7 +285,7 @@ if (distance < 20) {
                               │    Google Gemini API    │
                               │    (gratis, cloud)      │
                               │                        │
-                              │    Model: gemini-2.0   │
+                              │    Model: gemini-2.5   │
                               │    flash               │
                               └────────────────────────┘
 ```
@@ -376,7 +376,7 @@ class GeminiService {
 
   GeminiService() {
     _model = GenerativeModel(
-      model: 'gemini-2.0-flash',    // Model cepat & gratis
+      model: 'gemini-2.5-flash',    // Model cepat & gratis (2.0-flash free tier sudah limit:0)
       apiKey: ApiKeys.geminiApiKey,
       generationConfig: GenerationConfig(
         temperature: 0.7,            // 0 = kaku, 1 = kreatif. 0.7 = seimbang
@@ -707,6 +707,13 @@ Tunjukkan AI bisa menjawab dalam Bahasa Indonesia DAN Inggris. Juri suka fleksib
 ---
 
 ## 📊 Batas Pemakaian Gratis (Gemini Free Tier)
+
+> ⚠️ **PENTING — Pelajaran dari lapangan (Juli 2026):**
+> Model **`gemini-2.0-flash` sudah TIDAK punya free tier** (`limit: 0` → error 429 `RESOURCE_EXHAUSTED`).
+> Gunakan **`gemini-2.5-flash`** yang masih gratis. Ini sudah diterapkan di kode.
+>
+> Selain itu, API key **HARUS** berformat `AIzaSy...` dari [Google AI Studio](https://aistudio.google.com/apikey).
+> Token berformat `AQ.Ab8...` (OAuth/ephemeral) akan terautentikasi tapi tetap `limit: 0`.
 
 ### Berapa Kuota Gratis?
 

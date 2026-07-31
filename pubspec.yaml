@@ -28,6 +28,9 @@ dependencies:
   # HTTP for Open-Meteo (free, no key needed)
   http: ^1.2.1
 
+  # Google Gemini AI (free tier)
+  google_generative_ai: ^0.4.7
+
   # Local storage
   shared_preferences: ^2.2.2
 

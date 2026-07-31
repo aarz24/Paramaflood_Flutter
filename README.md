@@ -4,16 +4,16 @@
 
 # 🌊 Parama Flood & Weather Monitor (Paramaflood)
 
-### ESP32 Weather & Flood Station · Firebase · Flutter · Google Gemini 2.0 AI
+### ESP32 Weather & Flood Station · Firebase · Flutter · Google Gemini 2.5 AI
 
 [![Flutter](https://img.shields.io/badge/Flutter-3.10%2B-02569B?style=for-the-badge&logo=flutter&logoColor=white)](https://flutter.dev)
 [![Dart](https://img.shields.io/badge/Dart-3.0%2B-0175C2?style=for-the-badge&logo=dart&logoColor=white)](https://dart.dev)
 [![Firebase](https://img.shields.io/badge/Firebase-Realtime_DB-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)](https://firebase.google.com)
-[![Google Gemini](https://img.shields.io/badge/Gemini-2.0_Flash_AI-8E75B2?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev)
+[![Google Gemini](https://img.shields.io/badge/Gemini-2.5_Flash_AI-8E75B2?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev)
 [![ESP32](https://img.shields.io/badge/ESP32-Arduino-E7352C?style=for-the-badge&logo=arduino&logoColor=white)](https://www.espressif.com)
 [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 
-A professional, AI-powered real-time weather monitoring and flood early warning system. Pairing an **ESP32 hardware sensor node** with a **Flutter dashboard** and **Google Gemini 2.0 Flash AI**, Paramaflood evaluates multi-sensor telemetry to predict flood risks before critical levels are reached.
+A professional, AI-powered real-time weather monitoring and flood early warning system. Pairing an **ESP32 hardware sensor node** with a **Flutter dashboard** and **Google Gemini 2.5 Flash AI**, Paramaflood evaluates multi-sensor telemetry to predict flood risks before critical levels are reached.
 
 </div>
 
@@ -25,7 +25,7 @@ A professional, AI-powered real-time weather monitoring and flood early warning 
 |---|---|---|
 | **Arya** | 🔧 Hardware Lead | Setup ESP32, 7+ sensor telemetry, kalibrasi, & simulasi demo |
 | **Ariel** | 🎨 Frontend & UI Lead | Desain Logo App (PFWM-1), UI Panel Analisis AI, Chat ParaBot, & Animasi |
-| **Naina** | ⚙️ Backend & AI Lead | Integrasi Google Gemini 2.0 Flash API, Prompt Engineering, & App State |
+| **Naina** | ⚙️ Backend & AI Lead | Integrasi Google Gemini 2.5 Flash API, Prompt Engineering, & App State |
 
 ---
 
@@ -65,7 +65,7 @@ A professional, AI-powered real-time weather monitoring and flood early warning 
                                                       │
                                                       ▼
                                           ┌──────────────────────────┐
-                                          │   Google Gemini 2.0 AI   │
+                                          │   Google Gemini 2.5 AI   │
                                           │   Real-time Telemetry    │
                                           │   Analysis & Flood Risk  │
                                           └──────────────────────────┘
