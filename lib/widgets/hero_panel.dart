@@ -82,21 +82,21 @@ class _HeroPanelState extends State<HeroPanel> with SingleTickerProviderStateMix
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      AppTheme.heroAcc.withOpacity(0.18),
-                      AppTheme.internet.withOpacity(0.08),
-                      AppTheme.card.withOpacity(0.85), // Slightly more transparent to see waves
+                      Colors.white.withValues(alpha: 0.85),
+                      Colors.white.withValues(alpha: 0.55),
+                      Colors.white.withValues(alpha: 0.25),
                     ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
                   ),
-                  borderRadius: BorderRadius.circular(28),
-                  border: Border.all(color: Colors.white.withOpacity(0.08), width: 1.25),
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: AppTheme.cardBorder, width: 1.25),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.28),
-                      blurRadius: 32,
-                      spreadRadius: -8,
-                      offset: const Offset(0, 14),
+                      color: AppTheme.heroAcc.withValues(alpha: 0.10),
+                      blurRadius: 20,
+                      spreadRadius: 2,
+                      offset: const Offset(0, 6),
                     )
                   ],
                 ),
@@ -110,16 +110,16 @@ class _HeroPanelState extends State<HeroPanel> with SingleTickerProviderStateMix
                             children: [
                               Row(
                                 children: [
-                                  const Icon(Icons.location_on, color: AppTheme.heroAcc, size: 14),
+                                  const Icon(Icons.location_on_rounded, color: AppTheme.heroAcc, size: 15),
                                   const SizedBox(width: 4),
                                   Expanded(
                                     child: widget.locationLoading
                                         ? Text(
-                                            'Locating...',
-                                            style: GoogleFonts.orbitron(
-                                              color: AppTheme.heroAcc.withOpacity(0.5),
-                                              fontSize: 10,
-                                              letterSpacing: 1.5,
+                                            'Mencari lokasi...',
+                                            style: GoogleFonts.outfit(
+                                              color: AppTheme.heroAcc.withValues(alpha: 0.6),
+                                              fontSize: 11,
+                                              letterSpacing: 1.0,
                                             ),
                                           )
                                         : GestureDetector(
@@ -138,10 +138,11 @@ class _HeroPanelState extends State<HeroPanel> with SingleTickerProviderStateMix
                                                 Flexible(
                                                   child: Text(
                                                     widget.locationName,
-                                                    style: GoogleFonts.orbitron(
+                                                    style: GoogleFonts.outfit(
                                                       color: _locationColor,
-                                                      fontSize: 10,
-                                                      letterSpacing: 1.5,
+                                                      fontSize: 11,
+                                                      letterSpacing: 0.8,
+                                                      fontWeight: FontWeight.w600,
                                                     ),
                                                     overflow: TextOverflow.ellipsis,
                                                   ),
@@ -151,7 +152,7 @@ class _HeroPanelState extends State<HeroPanel> with SingleTickerProviderStateMix
                                                   Icon(
                                                     widget.locationDeniedForever ? Icons.settings_outlined : Icons.refresh,
                                                     color: AppTheme.offline,
-                                                    size: 11,
+                                                    size: 12,
                                                   ),
                                                 ],
                                               ],
@@ -160,9 +161,9 @@ class _HeroPanelState extends State<HeroPanel> with SingleTickerProviderStateMix
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 10),
+                              const SizedBox(height: 6),
                               Text(
-                                'Realtime canal monitoring',
+                                'Sistem Monitoring Ketinggian Air',
                                 style: GoogleFonts.outfit(
                                   color: AppTheme.subtext,
                                   fontSize: 12,
@@ -176,10 +177,11 @@ class _HeroPanelState extends State<HeroPanel> with SingleTickerProviderStateMix
                         const SizedBox(width: 6),
                         Text(
                           widget.isOnline ? 'ONLINE' : 'OFFLINE',
-                          style: GoogleFonts.orbitron(
+                          style: GoogleFonts.outfit(
                             color: widget.isOnline ? AppTheme.online : AppTheme.offline,
-                            fontSize: 9,
-                            letterSpacing: 1.5,
+                            fontSize: 10,
+                            letterSpacing: 1.2,
+                            fontWeight: FontWeight.w700,
                           ),
                         ),
                       ],
@@ -199,9 +201,9 @@ class _HeroPanelState extends State<HeroPanel> with SingleTickerProviderStateMix
                                     widget.live.distance.toStringAsFixed(0),
                                     style: GoogleFonts.outfit(
                                       color: AppTheme.text,
-                                      fontSize: 66,
+                                      fontSize: 62,
                                       fontWeight: FontWeight.w800,
-                                      letterSpacing: -2.4,
+                                      letterSpacing: -2.0,
                                       height: 0.95,
                                     ),
                                   ).animate(key: ValueKey(widget.live.distance.toStringAsFixed(0))).scaleXY(begin: 0.9, duration: 300.ms, curve: Curves.easeOutBack).fadeIn(duration: 250.ms),
@@ -211,7 +213,7 @@ class _HeroPanelState extends State<HeroPanel> with SingleTickerProviderStateMix
                                       'cm',
                                       style: GoogleFonts.outfit(
                                         color: AppTheme.heroAcc,
-                                        fontSize: 24,
+                                        fontSize: 22,
                                         fontWeight: FontWeight.w700,
                                       ),
                                     ),
@@ -219,26 +221,33 @@ class _HeroPanelState extends State<HeroPanel> with SingleTickerProviderStateMix
                                 ],
                               ),
                               const SizedBox(height: 8),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-                                decoration: BoxDecoration(
-                                  color: _statusColor(widget.live.distanceLabel).withOpacity(0.14),
-                                  borderRadius: BorderRadius.circular(999),
-                                  border: Border.all(color: _statusColor(widget.live.distanceLabel).withOpacity(0.22)),
-                                ),
-                                child: Text(
-                                  widget.live.distanceLabel.toUpperCase(),
-                                  style: GoogleFonts.outfit(
-                                    color: _statusColor(widget.live.distanceLabel),
-                                    fontSize: 10,
-                                    letterSpacing: 2,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 8),
+                               Container(
+                                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                                 decoration: BoxDecoration(
+                                   color: Colors.white.withValues(alpha: 0.90),
+                                   borderRadius: BorderRadius.circular(999),
+                                   border: Border.all(color: _statusColor(widget.live.distanceLabel).withValues(alpha: 0.6), width: 1.2),
+                                   boxShadow: [
+                                     BoxShadow(
+                                       color: _statusColor(widget.live.distanceLabel).withValues(alpha: 0.15),
+                                       blurRadius: 8,
+                                       offset: const Offset(0, 2),
+                                     ),
+                                   ],
+                                 ),
+                                 child: Text(
+                                   widget.live.distanceLabel.toUpperCase(),
+                                   style: GoogleFonts.outfit(
+                                     color: _statusColor(widget.live.distanceLabel),
+                                     fontSize: 10,
+                                     letterSpacing: 1.5,
+                                     fontWeight: FontWeight.bold,
+                                   ),
+                                 ),
+                               ),
+                              const SizedBox(height: 6),
                               Text(
-                                'Water Level Status · ${widget.live.distanceLabel.toUpperCase()}',
+                                'Jarak Permukaan Air Ke Sensor',
                                 style: GoogleFonts.outfit(
                                   color: AppTheme.subtext,
                                   fontSize: 11,
@@ -257,38 +266,40 @@ class _HeroPanelState extends State<HeroPanel> with SingleTickerProviderStateMix
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
                                 Text(
-                                  DateFormat('hh:mm:ss a').format(now),
-                                  style: GoogleFonts.orbitron(
+                                  DateFormat('HH:mm:ss').format(now),
+                                  style: GoogleFonts.outfit(
                                     color: AppTheme.text,
-                                    fontSize: 16,
+                                    fontSize: 18,
                                     fontWeight: FontWeight.bold,
                                     letterSpacing: 1,
                                   ),
                                 ),
                                 Text(
-                                  DateFormat('EEEE, MMM d').format(now),
-                                  style: GoogleFonts.shareTechMono(
+                                  DateFormat('EEEE, d MMM').format(now),
+                                  style: GoogleFonts.outfit(
                                     color: AppTheme.subtext,
                                     fontSize: 11,
+                                    fontWeight: FontWeight.w500,
                                   ),
                                 ),
                                 const SizedBox(height: 8),
-                                if (widget.internet != null)
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                                    decoration: BoxDecoration(
-                                      color: AppTheme.internet.withOpacity(0.14),
-                                      borderRadius: BorderRadius.circular(999),
-                                      border: Border.all(color: AppTheme.internet.withOpacity(0.35)),
-                                    ),
-                                    child: Text(
-                                      '🌐 ${widget.internet!.temp.toStringAsFixed(1)}°C  ${widget.internet!.conditionEmoji}',
-                                      style: GoogleFonts.orbitron(
-                                        color: AppTheme.internet,
-                                        fontSize: 10,
+                                  if (widget.internet != null)
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white.withValues(alpha: 0.90),
+                                        borderRadius: BorderRadius.circular(999),
+                                        border: Border.all(color: AppTheme.heroAcc.withValues(alpha: 0.35)),
+                                      ),
+                                      child: Text(
+                                        '${widget.internet!.temp.toStringAsFixed(1)}°C  ${widget.internet!.conditionEmoji}',
+                                        style: GoogleFonts.outfit(
+                                          color: AppTheme.heroAcc,
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w600,
+                                        ),
                                       ),
                                     ),
-                                  ),
                               ],
                             );
                           },
@@ -299,14 +310,14 @@ class _HeroPanelState extends State<HeroPanel> with SingleTickerProviderStateMix
                     const Divider(color: AppTheme.divider, height: 1),
                     const SizedBox(height: 12),
                     Wrap(
-                      spacing: 10,
-                      runSpacing: 10,
+                      spacing: 8,
+                      runSpacing: 8,
                       children: [
-                        _chip(Icons.thermostat_outlined, '${widget.live.temp.toStringAsFixed(1)}°C', AppTheme.colTemp),
-                        _chip(Icons.water_drop_outlined, '${widget.live.hum.toStringAsFixed(0)}%', AppTheme.colHum),
-                        _chip(Icons.air, '${widget.live.wind.toStringAsFixed(1)} m/s', AppTheme.colWind),
-                        _chip(Icons.speed_outlined, '${(widget.live.pres / 10).toStringAsFixed(1)} kPa', AppTheme.colPres),
-                        _chip(Icons.vibration, '${widget.frameCount % 9999}', AppTheme.subtext.withOpacity(0.55)),
+                        _chip(Icons.thermostat_rounded, '${widget.live.temp.toStringAsFixed(1)}°C'),
+                        _chip(Icons.water_drop_rounded, '${widget.live.hum.toStringAsFixed(0)}%'),
+                        _chip(Icons.air_rounded, '${widget.live.wind.toStringAsFixed(1)} m/s'),
+                        _chip(Icons.compress_rounded, '${(widget.live.pres / 10).toStringAsFixed(1)} kPa'),
+                        _chip(Icons.sync_rounded, '#${widget.frameCount % 9999}'),
                       ],
                     ),
                   ],
@@ -340,25 +351,39 @@ class _HeroPanelState extends State<HeroPanel> with SingleTickerProviderStateMix
   
   Color _statusColor(String label) {
     if (label == 'SAFE') return AppTheme.colDist;
-    if (label == 'HIGH LVL') return AppTheme.colLight;
+    if (label == 'HIGH LVL') return AppTheme.warning;
     if (label == 'WARNING') return AppTheme.colTemp;
     if (label == 'CRITICAL') return AppTheme.offline;
     return AppTheme.heroAcc;
   }
 
-  Widget _chip(IconData icon, String val, Color c) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+  Widget _chip(IconData icon, String val) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
-          color: c.withOpacity(0.11),
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: c.withOpacity(0.22)),
+          color: Colors.white.withValues(alpha: 0.90),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppTheme.cardBorder),
+          boxShadow: [
+            BoxShadow(
+              color: AppTheme.heroAcc.withValues(alpha: 0.05),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 14, color: c),
+            Icon(icon, size: 13, color: AppTheme.heroAcc),
             const SizedBox(width: 6),
-            Text(val, style: GoogleFonts.outfit(color: c, fontSize: 11, fontWeight: FontWeight.w600)),
+            Text(
+              val,
+              style: GoogleFonts.outfit(
+                color: AppTheme.text,
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ],
         ),
       );
@@ -377,7 +402,7 @@ class _StatusDot extends StatelessWidget {
       decoration: BoxDecoration(
           shape: BoxShape.circle,
           color: c,
-          boxShadow: [BoxShadow(color: c.withOpacity(0.7), blurRadius: 6)]),
+          boxShadow: [BoxShadow(color: c.withValues(alpha: 0.7), blurRadius: 6)]),
     )
         .animate(onPlay: (ctrl) => ctrl.repeat())
         .fadeOut(duration: 900.ms)
@@ -400,11 +425,11 @@ class _WaterWavePainter extends CustomPainter {
     final yOffset = size.height - waterHeight;
 
     final paint1 = Paint()
-      ..color = AppTheme.colDist.withOpacity(0.15)
+      ..color = AppTheme.heroAcc.withValues(alpha: 0.20)
       ..style = PaintingStyle.fill;
 
     final paint2 = Paint()
-      ..color = AppTheme.colDist.withOpacity(0.25)
+      ..color = AppTheme.heroAcc.withValues(alpha: 0.35)
       ..style = PaintingStyle.fill;
 
     // Draw background wave

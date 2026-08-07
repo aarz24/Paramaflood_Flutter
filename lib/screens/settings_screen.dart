@@ -161,7 +161,7 @@ class SettingsScreen extends StatelessWidget {
                       .slideY(begin: 0.1),
                 ),
 
-                const SliverToBoxAdapter(child: SizedBox(height: 28)),
+                const SliverToBoxAdapter(child: SizedBox(height: 20)),
               ],
             ),
           ),
@@ -179,16 +179,16 @@ class _Header extends StatelessWidget {
       margin: const EdgeInsets.fromLTRB(12, 8, 12, 0),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            AppTheme.card.withOpacity(0.72),
-            AppTheme.cardSolid.withOpacity(0.92),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: AppTheme.cardSolid,
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: AppTheme.cardBorder),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.heroAcc.withOpacity(0.06),
+            blurRadius: 18,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Row(
         children: [
@@ -197,17 +197,11 @@ class _Header extends StatelessWidget {
             height: 42,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(14),
-              gradient: LinearGradient(
-                colors: [
-                  AppTheme.heroAcc.withOpacity(0.25),
-                  AppTheme.internet.withOpacity(0.15),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
+              color: AppTheme.heroAcc.withOpacity(0.12),
+              border: Border.all(color: AppTheme.heroAcc.withOpacity(0.25)),
             ),
             child: const Icon(Icons.settings_rounded,
-                color: AppTheme.text, size: 22),
+                color: AppTheme.heroAcc, size: 22),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -258,14 +252,14 @@ class _InfoCard extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppTheme.card,
+        color: AppTheme.cardSolid,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: AppTheme.cardBorder),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.12),
+            color: AppTheme.heroAcc.withOpacity(0.06),
             blurRadius: 16,
-            offset: const Offset(0, 6),
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -403,14 +397,14 @@ class _Phase2Card extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppTheme.card,
+        color: AppTheme.cardSolid,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppTheme.heroAcc.withOpacity(0.15)),
+        border: Border.all(color: AppTheme.cardBorder),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.12),
+            color: AppTheme.heroAcc.withOpacity(0.06),
             blurRadius: 16,
-            offset: const Offset(0, 6),
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -433,13 +427,13 @@ class _Phase2Card extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: AppTheme.internet.withOpacity(0.15),
+                  color: AppTheme.heroAcc.withOpacity(0.12),
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Text(
                   'NEXT SEMESTER',
                   style: GoogleFonts.outfit(
-                    color: AppTheme.internet,
+                    color: AppTheme.heroAcc,
                     fontSize: 8,
                     fontWeight: FontWeight.w700,
                     letterSpacing: 1,

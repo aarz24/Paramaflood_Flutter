@@ -93,7 +93,7 @@ class _AiChatPanelState extends State<AiChatPanel> {
                       ),
                     ),
                     child: const Center(
-                      child: Text('🤖', style: TextStyle(fontSize: 20)),
+                      child: Icon(Icons.auto_awesome_rounded, color: AppTheme.heroAcc, size: 20),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -170,7 +170,7 @@ class _AiChatPanelState extends State<AiChatPanel> {
                               msg['message'] ?? '',
                               style: GoogleFonts.outfit(
                                 color:
-                                    isUser ? AppTheme.bg : AppTheme.text,
+                                    isUser ? Colors.white : AppTheme.text,
                                 fontSize: 13,
                                 height: 1.45,
                                 fontWeight: isUser
@@ -211,7 +211,7 @@ class _AiChatPanelState extends State<AiChatPanel> {
                             borderRadius: BorderRadius.circular(24),
                             borderSide: BorderSide.none,
                           ),
-                          fillColor: AppTheme.bg,
+                          fillColor: AppTheme.bgAlt,
                           filled: true,
                           contentPadding: const EdgeInsets.symmetric(
                               horizontal: 16, vertical: 10),

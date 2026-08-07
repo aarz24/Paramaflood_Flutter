@@ -2,35 +2,40 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
-  static const Color bg = Color(0xFF050814);
-  static const Color bgAlt = Color(0xFF0B1120);
-  static const Color card = Color(0x33111A33);
-  static const Color cardSolid = Color(0xFF111A30);
-  static const Color text = Color(0xFFF4F7FB);
-  static const Color subtext = Color(0xFF93A4BF);
+  // ── Clean White & Water Blue Palette ──────────────────────────
+  static const Color bg = Color(0xFFF8FBFF);          // Soft Ice White
+  static const Color bgAlt = Color(0xFFEFF6FF);       // Pale Water Blue Tint
+  static const Color card = Color(0x1A3B82F6);         // Glass Water Card
+  static const Color cardSolid = Color(0xFFFFFFFF);    // Pure White Card
+  static const Color cardBorder = Color(0xFFDBE8F4);   // Soft Blue-Grey Border
 
-  static const Color colHum = Color(0xFF35B8FF);
-  static const Color colWind = Color(0xFF38D996);
-  static const Color colPres = Color(0xFFA78BFA);
-  static const Color heroAcc = Color(0xFF66D6FF);
-  static const Color colTemp = Color(0xFFFF7A59);
-  static const Color colLight = Color(0xFFFBBF24);
-  static const Color colRain = Color(0xFF6C7CFF);
-  static const Color colDist = Color(0xFF2DD4BF);
-  static const Color colBatt = Color(0xFF4ADE80);
+  static const Color text = Color(0xFF0F172A);         // Deep Slate Text
+  static const Color subtext = Color(0xFF64748B);      // Cool Muted Slate
 
-  static const Color online = Color(0xFF32D583);
-  static const Color offline = Color(0xFFF97066);
-  static const Color internet = Color(0xFFA78BFA);
+  // ── Feature & Telemetry Accents ──────────────────────────────
+  static const Color heroAcc = Color(0xFF0EA5E9);      // Water Sky Blue
+  static const Color colTemp = Color(0xFFE67E22);      // Warm Terracotta
+  static const Color colHum = Color(0xFF0284C7);       // Deep Water Blue
+  static const Color colWind = Color(0xFF64748B);      // Wind Slate
+  static const Color colPres = Color(0xFF7C3AED);      // Atmospheric Violet
+  static const Color colLight = Color(0xFFD97706);     // Sunlight Amber
+  static const Color colRain = Color(0xFF2563EB);      // Rain Indigo Blue
+  static const Color colDist = Color(0xFF0369A1);      // Flood Steel Blue
+  static const Color colBatt = Color(0xFF059669);      // Eco Emerald
 
-  static const Color divider = Color(0x26D8E2F0);
+  static const Color online = Color(0xFF059669);       // Emerald Green
+  static const Color warning = Color(0xFFD97706);      // Amber Alert
+  static const Color offline = Color(0xFFDC2626);      // Danger Red
+  static const Color internet = Color(0xFF7C3AED);     // Sync Purple
+
+  static const Color divider = Color(0x1A94A3B8);
 
   static ThemeData get dark => ThemeData(
-    brightness: Brightness.dark,
+    brightness: Brightness.light,
     useMaterial3: true,
     scaffoldBackgroundColor: bg,
     cardColor: cardSolid,
-    colorScheme: const ColorScheme.dark(
+    colorScheme: const ColorScheme.light(
       primary: heroAcc,
       secondary: colHum,
       surface: cardSolid,
@@ -52,16 +57,16 @@ class AppTheme {
       elevation: 0,
       margin: EdgeInsets.zero,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(24),
-        side: BorderSide(color: Colors.white.withOpacity(0.05)),
+        borderRadius: BorderRadius.circular(20),
+        side: const BorderSide(color: cardBorder, width: 1),
       ),
     ),
     textTheme: TextTheme(
       displayLarge: GoogleFonts.outfit(
         color: text,
-        fontSize: 50,
+        fontSize: 48,
         fontWeight: FontWeight.w800,
-        letterSpacing: -1.2,
+        letterSpacing: -1.0,
       ),
       displayMedium: GoogleFonts.outfit(
         color: text,
@@ -71,13 +76,13 @@ class AppTheme {
       titleLarge: GoogleFonts.outfit(
         color: heroAcc,
         fontSize: 14,
-        letterSpacing: 2,
+        letterSpacing: 1.2,
         fontWeight: FontWeight.w700,
       ),
       titleMedium: GoogleFonts.outfit(
         color: text,
         fontSize: 14,
-        fontWeight: FontWeight.w500,
+        fontWeight: FontWeight.w600,
       ),
       bodyMedium: GoogleFonts.outfit(
         color: subtext,
@@ -85,8 +90,8 @@ class AppTheme {
       ),
       labelSmall: GoogleFonts.outfit(
         color: subtext,
-        fontSize: 9,
-        letterSpacing: 1.2,
+        fontSize: 10,
+        letterSpacing: 0.8,
         fontWeight: FontWeight.w600,
       ),
     ),

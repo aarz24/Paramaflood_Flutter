@@ -14,6 +14,7 @@ class SensorCard extends StatelessWidget {
   final Color color;
   final String label;
   final String trend;
+  final IconData? icon;
   final String? compareValue;
 
   const SensorCard({
@@ -26,6 +27,7 @@ class SensorCard extends StatelessWidget {
     required this.color,
     required this.label,
     required this.trend,
+    this.icon,
     this.compareValue,
   });
 
@@ -34,85 +36,93 @@ class SensorCard extends StatelessWidget {
     final pct = ((value - minVal) / (maxVal - minVal)).clamp(0.0, 1.0);
 
     return ClipRRect(
-      borderRadius: BorderRadius.circular(24),
+      borderRadius: BorderRadius.circular(20),
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
         child: Container(
           decoration: BoxDecoration(
-            color: AppTheme.card,
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: Colors.white.withOpacity(0.05), width: 1),
+            color: AppTheme.cardSolid,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: AppTheme.cardBorder, width: 1),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.15),
-                blurRadius: 20,
-                offset: const Offset(0, 8),
-              ),
-              // Inner glow top edge
-              BoxShadow(
-                color: color.withOpacity(0.1),
-                blurRadius: 20,
-                spreadRadius: -5,
-                offset: const Offset(0, -5),
+                color: AppTheme.heroAcc.withValues(alpha: 0.08),
+                blurRadius: 16,
+                offset: const Offset(0, 6),
               ),
             ],
           ),
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
+            padding: const EdgeInsets.all(14),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Container(
-                  height: 3,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [color.withOpacity(0.25), color],
-                    ),
-                    borderRadius: BorderRadius.circular(999),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                // ── Header row: title + trend ─────────────────────
+                // ── Header row: Icon badge + Title + Trend ───────
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    Row(
                       children: [
-                        Text(title,
-                            style: GoogleFonts.outfit(
+                        if (icon != null) ...[
+                          Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: color.withValues(alpha: 0.15),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Icon(icon, size: 14, color: color),
+                          ),
+                          const SizedBox(width: 8),
+                        ],
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              title,
+                              style: GoogleFonts.outfit(
                                 color: color,
                                 fontSize: 11,
-                                letterSpacing: 2,
-                                fontWeight: FontWeight.w800)),
-                        const SizedBox(height: 2),
-                        Text('Realtime channel',
-                            style: GoogleFonts.outfit(
+                                letterSpacing: 1.2,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                            Text(
+                              'Sensor ESP32',
+                              style: GoogleFonts.outfit(
                                 color: AppTheme.subtext,
-                                fontSize: 8,
-                                letterSpacing: 0.8)),
+                                fontSize: 9,
+                              ),
+                            ),
+                          ],
+                        ),
                       ],
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
                       decoration: BoxDecoration(
-                        color: color.withOpacity(0.15),
+                        color: color.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(999),
                       ),
-                      child: Text(trend,
-                          style: GoogleFonts.outfit(
-                              color: color, fontSize: 12, fontWeight: FontWeight.bold)),
+                      child: Text(
+                        trend,
+                        style: GoogleFonts.outfit(
+                          color: color,
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                   ],
                 ),
 
-                // ── Premium Arc gauge ─────────────────────────────────────
+                // ── Arc gauge ─────────────────────────────────────
                 Expanded(
                   child: CustomPaint(
                     painter: _PremiumArcPainter(pct: pct, color: color),
                     child: Center(
                       child: Padding(
-                        padding: const EdgeInsets.only(top: 10),
+                        padding: const EdgeInsets.only(top: 8),
                         child: AnimatedSwitcher(
                           duration: const Duration(milliseconds: 300),
                           transitionBuilder: (child, anim) =>
@@ -124,17 +134,19 @@ class SensorCard extends StatelessWidget {
                               Text(
                                 value.toStringAsFixed(1),
                                 style: GoogleFonts.outfit(
-                                    color: AppTheme.text,
-                                fontSize: 24,
-                                    fontWeight: FontWeight.w800,
-                                    letterSpacing: -0.5),
+                                  color: AppTheme.text,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: -0.5,
+                                ),
                               ),
                               Text(
                                 unit.trim(),
                                 style: GoogleFonts.outfit(
-                                    color: color.withOpacity(0.8),
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600),
+                                  color: color,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ],
                           ),
@@ -145,32 +157,40 @@ class SensorCard extends StatelessWidget {
                 ),
 
                 // ── Label ──────────────────────────────────────────
-                Text(label,
-                    style: GoogleFonts.outfit(
-                        color: AppTheme.subtext,
-                        fontSize: 10,
-                        fontWeight: FontWeight.w500,
-                        letterSpacing: 1.2)),
+                Text(
+                  label,
+                  style: GoogleFonts.outfit(
+                    color: AppTheme.subtext,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w500,
+                    letterSpacing: 0.5,
+                  ),
+                ),
 
-                // ── Firebase / Internet compare badge ─────────────
+                // ── OpenWeather Compare Badge ──────────────────────
                 if (compareValue != null) ...[
                   const SizedBox(height: 6),
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
                     decoration: BoxDecoration(
-                      color: AppTheme.internet.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: AppTheme.internet.withOpacity(0.3)),
+                      color: AppTheme.internet.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: AppTheme.internet.withValues(alpha: 0.25)),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.cloud_sync_outlined, size: 10, color: AppTheme.internet),
+                        const Icon(Icons.cloud_sync_outlined, size: 11, color: AppTheme.internet),
                         const SizedBox(width: 4),
-                        Text(compareValue!,
-                            style: GoogleFonts.outfit(
-                                color: AppTheme.internet, fontSize: 10, fontWeight: FontWeight.w600)),
+                        Text(
+                          'OpenWeather: $compareValue',
+                          style: GoogleFonts.outfit(
+                            color: AppTheme.internet,
+                            fontSize: 9,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ],
                     ),
                   ).animate().fadeIn(duration: 400.ms),
@@ -184,7 +204,7 @@ class SensorCard extends StatelessWidget {
   }
 }
 
-// ─── Premium Arc gauge painter ────────────────────────────────────────
+// ─── Arc gauge painter ──────────────────────────────────────────────
 class _PremiumArcPainter extends CustomPainter {
   final double pct;
   final Color color;
@@ -220,18 +240,18 @@ class _PremiumArcPainter extends CustomPainter {
         sweep * pct,
         false,
         Paint()
-          ..color = color.withOpacity(0.4)
+          ..color = color.withValues(alpha: 0.25)
           ..style = PaintingStyle.stroke
-          ..strokeWidth = 14
+          ..strokeWidth = 12
           ..strokeCap = StrokeCap.round
-          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8),
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6),
       );
       
       // Main arc with gradient
       final gradient = SweepGradient(
         startAngle: startAngle,
         endAngle: startAngle + sweep,
-        colors: [color.withOpacity(0.6), color],
+        colors: [color.withValues(alpha: 0.5), color],
         stops: const [0.0, 1.0],
       );
       
@@ -251,7 +271,7 @@ class _PremiumArcPainter extends CustomPainter {
       final na = startAngle + sweep * pct;
       canvas.drawCircle(
           Offset(cx + r * cos(na), cy + r * sin(na)), 4,
-          Paint()..color = Colors.white
+          Paint()..color = AppTheme.cardSolid
                  ..maskFilter = const MaskFilter.blur(BlurStyle.solid, 2));
     }
   }

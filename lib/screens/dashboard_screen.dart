@@ -28,23 +28,6 @@ class DashboardScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppTheme.bg,
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          showModalBottomSheet(
-            context: context,
-            isScrollControlled: true,
-            backgroundColor: Colors.transparent,
-            builder: (ctx) => const AiChatPanel(),
-          );
-        },
-        icon: const Icon(Icons.smart_toy_rounded),
-        label: Text(
-          'Tanya ParaBot',
-          style: GoogleFonts.outfit(fontWeight: FontWeight.w700, fontSize: 13),
-        ),
-        backgroundColor: AppTheme.heroAcc,
-        foregroundColor: AppTheme.bg,
-      ),
       body: Stack(
         children: [
           const Positioned.fill(
@@ -69,8 +52,8 @@ class DashboardScreen extends StatelessWidget {
                   shape: BoxShape.circle,
                   gradient: RadialGradient(
                     colors: [
-                      AppTheme.colDist.withOpacity(0.22),
-                      AppTheme.colDist.withOpacity(0.0),
+                      AppTheme.heroAcc.withValues(alpha: 0.08),
+                      AppTheme.heroAcc.withValues(alpha: 0.0),
                     ],
                   ),
                 ),
@@ -88,8 +71,8 @@ class DashboardScreen extends StatelessWidget {
                   shape: BoxShape.circle,
                   gradient: RadialGradient(
                     colors: [
-                      AppTheme.colRain.withOpacity(0.18),
-                      AppTheme.colRain.withOpacity(0.0),
+                      AppTheme.colHum.withValues(alpha: 0.06),
+                      AppTheme.colHum.withValues(alpha: 0.0),
                     ],
                   ),
                 ),
@@ -99,7 +82,7 @@ class DashboardScreen extends StatelessWidget {
           Positioned.fill(
             child: IgnorePointer(
               child: Opacity(
-                opacity: 0.12,
+                opacity: 0.06,
                 child: CustomPaint(painter: _GridPainter()),
               ),
             ),
@@ -161,7 +144,8 @@ class DashboardScreen extends StatelessWidget {
                           ).animate().fadeIn(duration: 400.ms),
                         ),
                       ),
-                      const SliverToBoxAdapter(child: SizedBox(height: 14)),
+                      const SliverToBoxAdapter(child: SizedBox(height: 16)),
+                      
                       // 🧠 Panel Analisis AI Gemini
                       SliverToBoxAdapter(
                         child: RepaintBoundary(
@@ -171,7 +155,8 @@ class DashboardScreen extends StatelessWidget {
                               .slideY(begin: 0.1),
                         ),
                       ),
-                      const SliverToBoxAdapter(child: SizedBox(height: 14)),
+                      const SliverToBoxAdapter(child: SizedBox(height: 20)),
+                      
                       // Show waiting banner when no real data yet
                       if (!data.hasReceivedLiveData)
                         SliverToBoxAdapter(
@@ -179,9 +164,9 @@ class DashboardScreen extends StatelessWidget {
                             margin: const EdgeInsets.symmetric(horizontal: 12),
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
-                              color: AppTheme.heroAcc.withOpacity(0.08),
+                              color: AppTheme.heroAcc.withValues(alpha: 0.08),
                               borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: AppTheme.heroAcc.withOpacity(0.25)),
+                              border: Border.all(color: AppTheme.heroAcc.withValues(alpha: 0.25)),
                             ),
                             child: Row(
                               children: [
@@ -199,8 +184,8 @@ class DashboardScreen extends StatelessWidget {
                                     children: [
                                       Text(
                                         data.error.isNotEmpty
-                                            ? 'Firebase Connection Issue'
-                                            : 'Waiting for sensor data…',
+                                            ? 'Kendala Koneksi Firebase'
+                                            : 'Menunggu Data Sensor...',
                                         style: GoogleFonts.outfit(
                                           color: AppTheme.text,
                                           fontSize: 13,
@@ -211,10 +196,10 @@ class DashboardScreen extends StatelessWidget {
                                       Text(
                                         data.error.isNotEmpty
                                             ? data.error
-                                            : 'Connecting to ESP32 via Firebase Realtime Database',
+                                            : 'Menghubungkan ke ESP32 via Firebase Realtime Database',
                                         style: GoogleFonts.outfit(
                                           color: AppTheme.subtext,
-                                          fontSize: 10,
+                                          fontSize: 11,
                                         ),
                                       ),
                                     ],
@@ -226,18 +211,29 @@ class DashboardScreen extends StatelessWidget {
                         ),
                       if (!data.hasReceivedLiveData)
                         const SliverToBoxAdapter(child: SizedBox(height: 14)),
+
+                      // Section Header: Telemetri Sensor
+                      const SliverToBoxAdapter(
+                        child: _SectionLabel(
+                          title: 'TELEMETRI SENSOR REALTIME',
+                          subtitle: 'Data pengukuran langsung stasiun cuaca & banjir ESP32',
+                        ),
+                      ),
+                      const SliverToBoxAdapter(child: SizedBox(height: 12)),
+
                       SliverPadding(
                         padding: const EdgeInsets.symmetric(horizontal: 12),
                         sliver: SliverGrid(
                           delegate: SliverChildListDelegate([
                             RepaintBoundary(
                               child: SensorCard(
-                                title: 'TEMP',
+                                title: 'SUHU',
                                 unit: '°C',
                                 value: live.temp,
                                 minVal: -10,
                                 maxVal: 50,
                                 color: AppTheme.colTemp,
+                                icon: Icons.thermostat_rounded,
                                 label: live.tempLabel,
                                 trend: _trend(live.temp, previous?.temp, 0.5),
                                 compareValue: internet != null ? '${internet.temp.toStringAsFixed(1)}°C' : null,
@@ -245,12 +241,13 @@ class DashboardScreen extends StatelessWidget {
                             ),
                             RepaintBoundary(
                               child: SensorCard(
-                                title: 'HUM',
+                                title: 'KELEMBABAN',
                                 unit: '%',
                                 value: live.hum,
                                 minVal: 0,
                                 maxVal: 100,
                                 color: AppTheme.colHum,
+                                icon: Icons.water_drop_rounded,
                                 label: live.humLabel,
                                 trend: _trend(live.hum, previous?.hum, 1),
                                 compareValue: internet != null ? '${internet.hum.toStringAsFixed(0)}%' : null,
@@ -258,12 +255,13 @@ class DashboardScreen extends StatelessWidget {
                             ),
                             RepaintBoundary(
                               child: SensorCard(
-                                title: 'WIND',
+                                title: 'ANGIN',
                                 unit: 'm/s',
                                 value: live.wind,
                                 minVal: 0,
                                 maxVal: 20,
                                 color: AppTheme.colWind,
+                                icon: Icons.air_rounded,
                                 label: live.windLabel,
                                 trend: _trend(live.wind, previous?.wind, 0.1),
                                 compareValue: internet != null ? '${internet.windSpeed.toStringAsFixed(1)}m/s' : null,
@@ -271,48 +269,52 @@ class DashboardScreen extends StatelessWidget {
                             ),
                             RepaintBoundary(
                               child: SensorCard(
-                                title: 'LIGHT',
+                                title: 'CAHAYA',
                                 unit: ' lx',
                                 value: live.light,
                                 minVal: 0,
                                 maxVal: 65000,
                                 color: AppTheme.colLight,
+                                icon: Icons.wb_sunny_rounded,
                                 label: live.lightLabel,
                                 trend: _trend(live.light, previous?.light, 50.0),
                               ).animate().fadeIn(delay: 200.ms).slideY(begin: 0.15),
                             ),
                             RepaintBoundary(
                               child: SensorCard(
-                                title: 'RAIN',
+                                title: 'HUJAN',
                                 unit: ' mm',
                                 value: live.rain,
                                 minVal: 0,
                                 maxVal: 50,
                                 color: AppTheme.colRain,
+                                icon: Icons.grain_rounded,
                                 label: live.rainLabel,
                                 trend: _trend(live.rain, previous?.rain, 0.1),
                               ).animate().fadeIn(delay: 240.ms).slideY(begin: 0.15),
                             ),
                             RepaintBoundary(
                               child: SensorCard(
-                                title: 'WATER LVL',
+                                title: 'KETINGGIAN AIR',
                                 unit: 'cm',
                                 value: live.distance,
                                 minVal: 0,
                                 maxVal: 400,
                                 color: AppTheme.colDist,
+                                icon: Icons.waves_rounded,
                                 label: live.distanceLabel,
                                 trend: _trend(live.distance, previous?.distance, 2.0),
                               ).animate().fadeIn(delay: 280.ms).slideY(begin: 0.15),
                             ),
                             RepaintBoundary(
                               child: SensorCard(
-                                title: 'BATTERY',
+                                title: 'BATERAI',
                                 unit: 'V',
                                 value: live.battery,
                                 minVal: 8,
                                 maxVal: 14,
                                 color: AppTheme.colBatt,
+                                icon: Icons.battery_charging_full_rounded,
                                 label: live.batteryLabel,
                                 trend: _trend(live.battery, previous?.battery, 0.2),
                                 compareValue: '${((live.battery - 9.0) / (12.6 - 9.0) * 100).clamp(0, 100).toStringAsFixed(0)}%',
@@ -331,14 +333,15 @@ class DashboardScreen extends StatelessWidget {
                       if (kDebugMode) ...[
                         const SliverToBoxAdapter(
                           child: _SectionLabel(
-                            title: 'TEST DATA',
-                            subtitle: 'Simulate extreme conditions without hardware (Debug Only)',
+                            title: 'SIMULASI DATA SENSOR (DEBUG)',
+                            subtitle: 'Uji respon aplikasi terhadap skenario cuaca ekstrem tanpa hardware',
                           ),
                         ),
+                        const SliverToBoxAdapter(child: SizedBox(height: 10)),
                         const SliverToBoxAdapter(child: _TestPanel()),
-                        const SliverToBoxAdapter(child: SizedBox(height: 28)),
+                        const SliverToBoxAdapter(child: SizedBox(height: 20)),
                       ],
-                      const SliverToBoxAdapter(child: SizedBox(height: 28)),
+                      const SliverToBoxAdapter(child: SizedBox(height: 20)),
                     ],
                   ),
                 );
@@ -404,8 +407,8 @@ class _GridPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white.withOpacity(0.25)
-      ..strokeWidth = 1;
+      ..color = AppTheme.heroAcc.withOpacity(0.06)
+      ..strokeWidth = 0.5;
 
     const spacing = 54.0;
     for (var x = 0.0; x < size.width; x += spacing) {
@@ -435,57 +438,94 @@ class _SectionIntro extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final statusText = locationLoading ? 'Locating device...' : locationName;
+    final statusText = locationLoading ? 'Mencari Lokasi...' : locationName;
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(12, 16, 12, 12),
+      padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(20),
           gradient: LinearGradient(
             colors: [
-              AppTheme.card.withOpacity(0.72),
-              AppTheme.cardSolid.withOpacity(0.92),
+              AppTheme.cardSolid.withValues(alpha: 0.95),
+              AppTheme.bgAlt.withValues(alpha: 0.90),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
-          border: Border.all(color: Colors.white.withOpacity(0.05)),
+          border: Border.all(color: AppTheme.cardBorder),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Weather intelligence, polished for the browser',
+              'Sistem Pengawasan Banjir & Cuaca Terpadu',
               style: GoogleFonts.outfit(
                 color: AppTheme.text,
-                fontSize: 16,
+                fontSize: 15,
                 fontWeight: FontWeight.w700,
               ),
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 4),
             Text(
-              'Realtime sensor telemetry, location context, and internet comparison in one view.',
+              'Integrasi sensor ESP32, data OpenWeather, dan analisis kecerdasan AI dalam satu tampilan.',
               style: GoogleFonts.outfit(
                 color: AppTheme.subtext,
-                fontSize: 12,
+                fontSize: 11,
                 height: 1.35,
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 10),
             Wrap(
               spacing: 8,
               runSpacing: 8,
               children: [
-                _pill(Icons.place_outlined, statusText, AppTheme.heroAcc),
-                _pill(Icons.bolt_outlined,
-                    online ? 'Realtime connected' : 'Device offline',
+                _pill(Icons.location_on_rounded, statusText, AppTheme.heroAcc),
+                _pill(Icons.sensors_rounded,
+                    online ? 'ESP32 Terhubung' : 'ESP32 Terputus',
                     online ? AppTheme.online : AppTheme.offline),
-                _pill(Icons.cloud_outlined,
-                    internet != null ? 'Internet weather ready' : 'Awaiting Open-Meteo',
-                    AppTheme.internet),
+                _pill(Icons.cloud_sync_rounded,
+                    internet != null ? 'OpenWeather Aktif' : 'Sinkronisasi OpenWeather...',
+                    AppTheme.heroAcc),
               ],
+            ),
+            const SizedBox(height: 10),
+            GestureDetector(
+              onTap: () {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (ctx) => const AiChatPanel(),
+                );
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: AppTheme.heroAcc.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppTheme.heroAcc.withValues(alpha: 0.25)),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.auto_awesome_rounded, color: AppTheme.heroAcc, size: 15),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Tanya ParaBot AI: "Apakah hari ini aman dari banjir?"',
+                        style: GoogleFonts.outfit(
+                          color: AppTheme.heroAcc,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const Icon(Icons.arrow_forward_ios_rounded, color: AppTheme.heroAcc, size: 11),
+                  ],
+                ),
+              ),
             ),
           ],
         ),
@@ -495,17 +535,17 @@ class _SectionIntro extends StatelessWidget {
 
   Widget _pill(IconData icon, String label, Color color) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.12),
+        color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: color.withOpacity(0.25)),
+        border: Border.all(color: color.withValues(alpha: 0.25)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: color, size: 14),
-          const SizedBox(width: 6),
+          Icon(icon, color: color, size: 13),
+          const SizedBox(width: 5),
           Text(
             label,
             style: GoogleFonts.outfit(
@@ -536,13 +576,13 @@ class _SectionLabel extends StatelessWidget {
           Text(
             title,
             style: GoogleFonts.outfit(
-              color: AppTheme.text,
+              color: AppTheme.heroAcc,
               fontSize: 12,
               fontWeight: FontWeight.w800,
-              letterSpacing: 1.8,
+              letterSpacing: 1.5,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 2),
           Text(
             subtitle,
             style: GoogleFonts.outfit(
@@ -572,36 +612,37 @@ class _AppBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.fromLTRB(12, 8, 12, 0),
-      padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
+      padding: const EdgeInsets.fromLTRB(16, 12, 12, 12),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            AppTheme.card.withOpacity(0.95),
-            AppTheme.cardSolid.withOpacity(0.85),
+            AppTheme.cardSolid,
+            AppTheme.bgAlt,
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppTheme.cardBorder),
       ),
       child: Row(
         children: [
           Container(
-            width: 48,
-            height: 48,
+            width: 44,
+            height: 44,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(14),
               gradient: LinearGradient(
                 colors: [
-                  AppTheme.heroAcc.withOpacity(0.25),
-                  AppTheme.internet.withOpacity(0.18),
+                  AppTheme.heroAcc.withValues(alpha: 0.22),
+                  AppTheme.colDist.withValues(alpha: 0.15),
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
+              border: Border.all(color: AppTheme.heroAcc.withValues(alpha: 0.3)),
             ),
-            child: const Icon(Icons.cloud_outlined, color: AppTheme.text),
+            child: const Icon(Icons.domain_rounded, color: AppTheme.heroAcc, size: 22),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -609,17 +650,17 @@ class _AppBar extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'PARAMAFLOOD MONITOR',
+                  'PARAMAFLOOD',
                   style: GoogleFonts.outfit(
                     color: AppTheme.text,
-                    fontSize: 18,
+                    fontSize: 17,
                     fontWeight: FontWeight.w800,
-                    letterSpacing: 0.4,
+                    letterSpacing: 0.8,
                   ),
                 ),
-                const SizedBox(height: 2),
+                const SizedBox(height: 1),
                 Text(
-                  'ESP32 flood monitoring · $locationName',
+                  'Flood & Weather Monitoring · $locationName',
                   style: GoogleFonts.outfit(
                     color: AppTheme.subtext,
                     fontSize: 11,
@@ -630,12 +671,12 @@ class _AppBar extends StatelessWidget {
             ),
           ),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
-              color: (online ? AppTheme.online : AppTheme.offline).withOpacity(0.14),
+              color: (online ? AppTheme.online : AppTheme.offline).withValues(alpha: 0.14),
               borderRadius: BorderRadius.circular(999),
               border: Border.all(
-                color: (online ? AppTheme.online : AppTheme.offline).withOpacity(0.35),
+                color: (online ? AppTheme.online : AppTheme.offline).withValues(alpha: 0.35),
               ),
             ),
             child: Text(
@@ -644,7 +685,7 @@ class _AppBar extends StatelessWidget {
                 color: online ? AppTheme.online : AppTheme.offline,
                 fontSize: 10,
                 fontWeight: FontWeight.w700,
-                letterSpacing: 1.1,
+                letterSpacing: 1.0,
               ),
             ),
           ),
@@ -686,63 +727,86 @@ class _TestPanelState extends State<_TestPanel> {
   }
 
   static final _presets = [
-    ('HOT & HUMID', _wd(38.5, 85, 1008, 2.1, 45000, 0.0, 110.0, 12.4)),
-    ('COLD & DRY', _wd(4.2, 22, 1025, 0.4, 25000, 0.0, 80.0, 11.2)),
-    ('STORMY', _wd(16, 95, 978, 14.5, 150, 4.2, 40.0, 12.0)),
-    ('MILD', _wd(22, 55, 1013, 3.2, 32000, 0.0, 120.0, 12.6)),
-    ('ISMAILIA', _wd(28.5, 42, 1011, 4.3, 55000, 0.0, 95.0, 12.2)),
+    ('Panas & Lembab', Icons.sunny, _wd(38.5, 85, 1008, 2.1, 45000, 0.0, 110.0, 12.4)),
+    ('Dingin & Kering', Icons.ac_unit_rounded, _wd(4.2, 22, 1025, 0.4, 25000, 0.0, 80.0, 11.2)),
+    ('Badai Hujan', Icons.thunderstorm_rounded, _wd(16, 95, 978, 14.5, 150, 4.2, 40.0, 12.0)),
+    ('Normal Sejuk', Icons.wb_cloudy_rounded, _wd(22, 55, 1013, 3.2, 32000, 0.0, 120.0, 12.6)),
+    ('Ismailia', Icons.location_city_rounded, _wd(28.5, 42, 1011, 4.3, 55000, 0.0, 95.0, 12.2)),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 12),
+      decoration: BoxDecoration(
+        color: AppTheme.cardSolid,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppTheme.cardBorder),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.heroAcc.withValues(alpha: 0.06),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       child: Column(
         children: [
-          GestureDetector(
+          InkWell(
             onTap: () => setState(() => _expanded = !_expanded),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-              decoration: BoxDecoration(
-                color: AppTheme.card,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: AppTheme.heroAcc.withOpacity(0.3)),
-              ),
+            borderRadius: BorderRadius.circular(20),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
               child: Row(
-                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(
-                    _expanded ? Icons.expand_less : Icons.science_outlined,
-                    color: AppTheme.heroAcc,
-                    size: 15,
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    'SIMULATOR / TEST DATA',
-                    style: GoogleFonts.outfit(
-                      color: AppTheme.heroAcc,
-                      fontSize: 10,
-                      letterSpacing: 1.5,
-                      fontWeight: FontWeight.bold,
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: AppTheme.heroAcc.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(12),
                     ),
+                    child: const Icon(Icons.science_rounded, color: AppTheme.heroAcc, size: 18),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Simulator Skenario Cuaca',
+                          style: GoogleFonts.outfit(
+                            color: AppTheme.text,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        Text(
+                          _expanded ? 'Pilih preset data di bawah ini' : 'Ketuk untuk membuka pilihan preset',
+                          style: GoogleFonts.outfit(
+                            color: AppTheme.subtext,
+                            fontSize: 11,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Icon(
+                    _expanded ? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded,
+                    color: AppTheme.heroAcc,
+                    size: 22,
                   ),
                 ],
               ),
             ),
           ),
           if (_expanded) ...[
-            const SizedBox(height: 8),
-            Container(
+            const Divider(height: 1, color: AppTheme.divider),
+            Padding(
               padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: AppTheme.card,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppTheme.divider),
-              ),
               child: Wrap(
                 spacing: 8,
                 runSpacing: 8,
-                children: _presets.map((preset) => _btn(context, preset.$1, preset.$2)).toList(),
+                children: _presets.map((preset) => _btn(context, preset.$1, preset.$2, preset.$3)).toList(),
               ),
             ),
           ],
@@ -751,7 +815,7 @@ class _TestPanelState extends State<_TestPanel> {
     );
   }
 
-  Widget _btn(BuildContext context, String label, WeatherData data) {
+  Widget _btn(BuildContext context, String label, IconData icon, WeatherData data) {
     return GestureDetector(
       onTap: () async {
         await context.read<AppState>().pushTestData(data);
@@ -759,9 +823,9 @@ class _TestPanelState extends State<_TestPanel> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                'Pushed: $label',
+                'Data Disimulasikan: $label',
                 style: GoogleFonts.outfit(
-                  color: AppTheme.bg,
+                  color: Colors.white,
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
                 ),
@@ -773,20 +837,26 @@ class _TestPanelState extends State<_TestPanel> {
         }
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: AppTheme.heroAcc.withOpacity(0.12),
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: AppTheme.heroAcc.withOpacity(0.4)),
+          color: AppTheme.heroAcc.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppTheme.heroAcc.withValues(alpha: 0.25)),
         ),
-        child: Text(
-          label,
-          style: GoogleFonts.outfit(
-            color: AppTheme.heroAcc,
-            fontSize: 10,
-            letterSpacing: 0.8,
-            fontWeight: FontWeight.w600,
-          ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 14, color: AppTheme.heroAcc),
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: GoogleFonts.outfit(
+                color: AppTheme.heroAcc,
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
         ),
       ),
     );

@@ -126,7 +126,7 @@ class HistoryScreen extends StatelessWidget {
                       ).animate().fadeIn(delay: 200.ms),
                     ),
 
-                    const SliverToBoxAdapter(child: SizedBox(height: 28)),
+                    const SliverToBoxAdapter(child: SizedBox(height: 20)),
                   ],
                 );
               },
