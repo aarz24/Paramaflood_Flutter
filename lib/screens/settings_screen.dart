@@ -197,11 +197,22 @@ class _Header extends StatelessWidget {
             height: 42,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(14),
-              color: AppTheme.heroAcc.withOpacity(0.12),
-              border: Border.all(color: AppTheme.heroAcc.withOpacity(0.25)),
+              border: Border.all(color: AppTheme.heroAcc.withOpacity(0.4)),
+              boxShadow: [
+                BoxShadow(
+                  color: AppTheme.heroAcc.withOpacity(0.2),
+                  blurRadius: 10,
+                  spreadRadius: 1,
+                ),
+              ],
             ),
-            child: const Icon(Icons.settings_rounded,
-                color: AppTheme.heroAcc, size: 22),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.asset(
+                'assets/images/splashscreen.png',
+                fit: BoxFit.cover,
+              ),
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(

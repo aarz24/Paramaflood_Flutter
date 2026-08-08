@@ -632,17 +632,22 @@ class _AppBar extends StatelessWidget {
             height: 44,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(14),
-              gradient: LinearGradient(
-                colors: [
-                  AppTheme.heroAcc.withValues(alpha: 0.22),
-                  AppTheme.colDist.withValues(alpha: 0.15),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              border: Border.all(color: AppTheme.heroAcc.withValues(alpha: 0.3)),
+              border: Border.all(color: AppTheme.heroAcc.withValues(alpha: 0.4)),
+              boxShadow: [
+                BoxShadow(
+                  color: AppTheme.heroAcc.withValues(alpha: 0.2),
+                  blurRadius: 10,
+                  spreadRadius: 1,
+                ),
+              ],
             ),
-            child: const Icon(Icons.domain_rounded, color: AppTheme.heroAcc, size: 22),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.asset(
+                'assets/images/splashscreen.png',
+                fit: BoxFit.cover,
+              ),
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(

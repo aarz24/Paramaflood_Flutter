@@ -190,17 +190,22 @@ class _Header extends StatelessWidget {
             height: 42,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(14),
-              gradient: LinearGradient(
-                colors: [
-                  AppTheme.colPres.withOpacity(0.25),
-                  AppTheme.heroAcc.withOpacity(0.15),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
+              border: Border.all(color: AppTheme.colPres.withOpacity(0.4)),
+              boxShadow: [
+                BoxShadow(
+                  color: AppTheme.colPres.withOpacity(0.2),
+                  blurRadius: 10,
+                  spreadRadius: 1,
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.asset(
+                'assets/images/splashscreen.png',
+                fit: BoxFit.cover,
               ),
             ),
-            child: const Icon(Icons.timeline_rounded,
-                color: AppTheme.text, size: 22),
           ),
           const SizedBox(width: 12),
           Expanded(
