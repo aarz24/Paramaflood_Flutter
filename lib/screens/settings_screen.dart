@@ -192,20 +192,9 @@ class _Header extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Container(
+          SizedBox(
             width: 42,
             height: 42,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: AppTheme.heroAcc.withOpacity(0.4)),
-              boxShadow: [
-                BoxShadow(
-                  color: AppTheme.heroAcc.withOpacity(0.2),
-                  blurRadius: 10,
-                  spreadRadius: 1,
-                ),
-              ],
-            ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: Image.asset(
