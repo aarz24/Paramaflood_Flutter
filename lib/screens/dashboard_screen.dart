@@ -644,8 +644,21 @@ class _AppBar extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: Image.asset(
-                'assets/images/splashscreen.png',
+                'assets/images/splashscreen.jpg',
                 fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Image.asset(
+                    'assets/images/splashscreen.png',
+                    fit: BoxFit.cover,
+                    errorBuilder: (ctx, err, st) {
+                      return const Icon(
+                        Icons.domain_rounded,
+                        color: AppTheme.heroAcc,
+                        size: 22,
+                      );
+                    },
+                  );
+                },
               ),
             ),
           ),
