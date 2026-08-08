@@ -47,11 +47,20 @@ flutter:
   uses-material-design: true
 
   assets:
+    - assets/images/
+    - assets/images/splashscreen.png
+    - assets/images/splashscreen.jpg
+    - assets/images/splashscreen.jpeg
+    - assets/images/Logo.jpeg
+    - assets/images/Logo.jpg
     - assets/images/icon.png
 
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "assets/images/icon.png" # مسار صورتك الجديدة
-  adaptive_icon_background: "#FFFFFF" # لون خلفية للأندرويد
-  adaptive_icon_foreground: "assets/images/icon.png"
+  image_path: "assets/images/Logo.jpg"
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/images/Logo.jpg"
+  web:
+    generate: true
+    image_path: "assets/images/Logo.jpg"

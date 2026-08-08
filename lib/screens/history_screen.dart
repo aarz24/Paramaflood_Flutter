@@ -126,7 +126,7 @@ class HistoryScreen extends StatelessWidget {
                       ).animate().fadeIn(delay: 200.ms),
                     ),
 
-                    const SliverToBoxAdapter(child: SizedBox(height: 28)),
+                    const SliverToBoxAdapter(child: SizedBox(height: 20)),
                   ],
                 );
               },
@@ -185,22 +185,29 @@ class _Header extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Container(
+          SizedBox(
             width: 42,
             height: 42,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(14),
-              gradient: LinearGradient(
-                colors: [
-                  AppTheme.colPres.withOpacity(0.25),
-                  AppTheme.heroAcc.withOpacity(0.15),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.asset(
+                'assets/images/splashscreen.jpg',
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Image.asset(
+                    'assets/images/splashscreen.png',
+                    fit: BoxFit.cover,
+                    errorBuilder: (ctx, err, st) {
+                      return const Icon(
+                        Icons.timeline_rounded,
+                        color: AppTheme.text,
+                        size: 22,
+                      );
+                    },
+                  );
+                },
               ),
             ),
-            child: const Icon(Icons.timeline_rounded,
-                color: AppTheme.text, size: 22),
           ),
           const SizedBox(width: 12),
           Expanded(

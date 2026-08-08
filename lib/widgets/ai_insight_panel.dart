@@ -19,15 +19,16 @@ class AiInsightPanel extends StatelessWidget {
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
-        gradient: LinearGradient(
-          colors: [
-            AppTheme.card.withOpacity(0.72),
-            AppTheme.cardSolid.withOpacity(0.92),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        border: Border.all(color: AppTheme.heroAcc.withOpacity(0.18)),
+        color: AppTheme.cardSolid,
+        border: Border.all(color: AppTheme.cardBorder),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.heroAcc.withOpacity(0.06),
+            blurRadius: 20,
+            spreadRadius: 2,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -36,30 +37,30 @@ class AiInsightPanel extends StatelessWidget {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: AppTheme.heroAcc.withOpacity(0.15),
+                  color: AppTheme.heroAcc.withValues(alpha: 0.15),
                   shape: BoxShape.circle,
                 ),
-                child: const Text('🧠', style: TextStyle(fontSize: 18)),
+                child: const Icon(Icons.auto_awesome_rounded, color: AppTheme.heroAcc, size: 18),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 10),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'ANALISIS AI GEMINI',
+                      'ANALISIS KECERDASAN AI',
                       style: GoogleFonts.outfit(
                         color: AppTheme.heroAcc,
                         fontSize: 11,
                         fontWeight: FontWeight.w700,
-                        letterSpacing: 1.8,
+                        letterSpacing: 1.5,
                       ),
                     ),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: 1),
                     Text(
-                      'Ringkasan Sistem & Prediksi Banjir',
+                      'Ringkasan Cuaca & Prediksi Banjir',
                       style: GoogleFonts.outfit(
                         color: AppTheme.text,
                         fontSize: 14,
@@ -95,9 +96,9 @@ class AiInsightPanel extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: AppTheme.offline.withOpacity(0.12),
+                color: AppTheme.offline.withOpacity(0.08),
                 borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: AppTheme.offline.withOpacity(0.4)),
+                border: Border.all(color: AppTheme.offline.withOpacity(0.25)),
               ),
               child: Row(
                 children: [
@@ -171,8 +172,8 @@ class AiInsightPanel extends StatelessWidget {
                       icon: const Icon(Icons.auto_awesome, size: 18),
                       label: const Text('Jalankan Analisis AI Pertama'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.heroAcc.withOpacity(0.2),
-                        foregroundColor: AppTheme.text,
+                        backgroundColor: AppTheme.heroAcc,
+                        foregroundColor: Colors.white,
                         textStyle: GoogleFonts.outfit(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
@@ -232,15 +233,15 @@ class AiInsightPanel extends StatelessWidget {
                           height: 14,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: AppTheme.internet,
+                            color: AppTheme.heroAcc,
                           ),
                         )
                       : const Icon(Icons.summarize_outlined, size: 16),
                   label: const Text('Laporan Harian AI'),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: AppTheme.internet,
+                    foregroundColor: AppTheme.heroAcc,
                     side: BorderSide(
-                        color: AppTheme.internet.withOpacity(0.4)),
+                        color: AppTheme.heroAcc.withOpacity(0.35)),
                     textStyle: GoogleFonts.outfit(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
@@ -307,9 +308,9 @@ class _RiskBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: bg.withOpacity(0.15),
+        color: bg.withOpacity(0.10),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: bg.withOpacity(0.7)),
+        border: Border.all(color: bg.withOpacity(0.5)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -344,7 +345,7 @@ class _DailyReportSheet extends StatelessWidget {
         maxHeight: MediaQuery.of(context).size.height * 0.7,
       ),
       decoration: const BoxDecoration(
-        color: AppTheme.bgAlt,
+        color: AppTheme.cardSolid,
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
       padding: const EdgeInsets.all(20),
@@ -354,11 +355,11 @@ class _DailyReportSheet extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Text('📊', style: TextStyle(fontSize: 22)),
+              const Icon(Icons.analytics_rounded, color: AppTheme.heroAcc, size: 22),
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  'Laporan Harian Paramaflood',
+                  'Laporan Harian ParamaFlood',
                   style: GoogleFonts.outfit(
                     color: AppTheme.text,
                     fontSize: 16,
@@ -380,7 +381,7 @@ class _DailyReportSheet extends StatelessWidget {
                     child: Padding(
                       padding: EdgeInsets.all(32),
                       child:
-                          CircularProgressIndicator(color: AppTheme.internet),
+                          CircularProgressIndicator(color: AppTheme.heroAcc),
                     ),
                   )
                 : SingleChildScrollView(
