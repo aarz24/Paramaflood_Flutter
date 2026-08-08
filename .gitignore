@@ -42,8 +42,9 @@ android/app/google-services.json
 ios/Runner/GoogleService-Info.plist
 lib/firebase_options.dart
 
-# Gemini API Key — jangan di-push!
+# Gemini API Key & Env — jangan di-push!
 lib/config/api_keys.dart
+.env
 
 # ── IDE ──────────────────────────────────────────────────────────
 .idea/

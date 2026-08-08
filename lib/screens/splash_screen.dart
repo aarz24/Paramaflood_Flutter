@@ -143,34 +143,28 @@ class _SplashScreenState extends State<SplashScreen>
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Water drop icon
+                // Splash Screen Image
                 Container(
-                  width: 80,
-                  height: 80,
+                  width: 100,
+                  height: 100,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(24),
-                    gradient: LinearGradient(
-                      colors: [
-                        AppTheme.colDist.withOpacity(0.3),
-                        AppTheme.heroAcc.withOpacity(0.15),
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
                     border:
-                        Border.all(color: AppTheme.colDist.withOpacity(0.3)),
+                        Border.all(color: AppTheme.colDist.withOpacity(0.4), width: 1.5),
                     boxShadow: [
                       BoxShadow(
-                        color: AppTheme.colDist.withOpacity(0.3),
+                        color: AppTheme.colDist.withOpacity(0.35),
                         blurRadius: 30,
                         spreadRadius: 5,
                       ),
                     ],
                   ),
-                  child: const Icon(
-                    Icons.water_drop_rounded,
-                    color: AppTheme.text,
-                    size: 40,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(22),
+                    child: Image.asset(
+                      'assets/images/splashscreen.png',
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 )
                     .animate()
