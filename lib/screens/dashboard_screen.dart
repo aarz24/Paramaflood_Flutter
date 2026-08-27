@@ -1,4 +1,3 @@
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -9,10 +8,11 @@ import '../models/weather_data.dart';
 import '../services/app_state.dart';
 import 'package:flutter/foundation.dart'; // Added for kDebugMode
 import '../services/app_theme.dart';
-import '../widgets/ai_chat_panel.dart';
 import '../widgets/ai_insight_panel.dart';
+import '../widgets/ai_chat_panel.dart';
 import '../widgets/hero_panel.dart';
 import '../widgets/sensor_card.dart';
+import '../widgets/water_canal_visualizer.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -154,6 +154,23 @@ class DashboardScreen extends StatelessWidget {
                               .fadeIn(delay: 60.ms)
                               .slideY(begin: 0.1),
                         ),
+                      ),
+                      const SliverToBoxAdapter(child: SizedBox(height: 18)),
+
+                      // 🌊 Simulator Penampang Kanal Air (2D Wave Physics)
+                      SliverToBoxAdapter(
+                        child: RepaintBoundary(
+                          child: Consumer<AppState>(
+                            builder: (context, state, _) {
+                              return WaterCanalVisualizer(
+                                waterLevelCm: state.live.waterLevel,
+                                rainRateMm: state.live.rain,
+                                windSpeedMs: state.live.wind,
+                                floodRiskLevel: state.floodRiskLevel,
+                              );
+                            },
+                          ),
+                        ).animate().fadeIn(delay: 90.ms).slideY(begin: 0.08),
                       ),
                       const SliverToBoxAdapter(child: SizedBox(height: 20)),
                       
@@ -407,7 +424,7 @@ class _GridPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = AppTheme.heroAcc.withOpacity(0.06)
+      ..color = AppTheme.heroAcc.withValues(alpha: 0.06)
       ..strokeWidth = 0.5;
 
     const spacing = 54.0;
@@ -614,7 +631,7 @@ class _AppBar extends StatelessWidget {
       margin: const EdgeInsets.fromLTRB(12, 8, 12, 0),
       padding: const EdgeInsets.fromLTRB(16, 12, 12, 12),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
+        gradient: const LinearGradient(
           colors: [
             AppTheme.cardSolid,
             AppTheme.bgAlt,

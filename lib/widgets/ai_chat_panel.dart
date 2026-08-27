@@ -87,8 +87,8 @@ class _AiChatPanelState extends State<AiChatPanel> {
                       shape: BoxShape.circle,
                       gradient: LinearGradient(
                         colors: [
-                          AppTheme.heroAcc.withOpacity(0.35),
-                          AppTheme.internet.withOpacity(0.25),
+                          AppTheme.heroAcc.withValues(alpha: 0.35),
+                          AppTheme.internet.withValues(alpha: 0.25),
                         ],
                       ),
                     ),
@@ -204,7 +204,7 @@ class _AiChatPanelState extends State<AiChatPanel> {
                           hintText:
                               'Tanyakan sesuatu (misal: "Aman keluar?")...',
                           hintStyle: GoogleFonts.outfit(
-                            color: AppTheme.subtext.withOpacity(0.6),
+                            color: AppTheme.subtext.withValues(alpha: 0.6),
                             fontSize: 12,
                           ),
                           border: OutlineInputBorder(
@@ -285,10 +285,10 @@ class _AiChatPanelState extends State<AiChatPanel> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 12, vertical: 8),
                       decoration: BoxDecoration(
-                        color: AppTheme.heroAcc.withOpacity(0.1),
+                        color: AppTheme.heroAcc.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                            color: AppTheme.heroAcc.withOpacity(0.35)),
+                            color: AppTheme.heroAcc.withValues(alpha: 0.35)),
                       ),
                       child: Text(
                         s,

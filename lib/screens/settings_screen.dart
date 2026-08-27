@@ -4,6 +4,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../services/app_state.dart';
 import '../services/app_theme.dart';
+import '../services/notification_service.dart';
+import '../services/voice_alert_service.dart';
+import 'login_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -39,8 +42,8 @@ class SettingsScreen extends StatelessWidget {
                   shape: BoxShape.circle,
                   gradient: RadialGradient(
                     colors: [
-                      AppTheme.heroAcc.withOpacity(0.1),
-                      AppTheme.heroAcc.withOpacity(0.0),
+                      AppTheme.heroAcc.withValues(alpha: 0.1),
+                      AppTheme.heroAcc.withValues(alpha: 0.0),
                     ],
                   ),
                 ),
@@ -55,11 +58,31 @@ class SettingsScreen extends StatelessWidget {
                 // ── Header ──
                 SliverToBoxAdapter(child: _Header()),
 
-                const SliverToBoxAdapter(child: SizedBox(height: 20)),
+                const SliverToBoxAdapter(child: SizedBox(height: 14)),
+
+                // ── Campus User Account Card ──
+                SliverToBoxAdapter(
+                  child: _CampusAccountCard()
+                      .animate()
+                      .fadeIn(delay: 50.ms)
+                      .slideY(begin: 0.1),
+                ),
+
+                const SliverToBoxAdapter(child: SizedBox(height: 12)),
+
+                // ── Flood Notification Test Card ──
+                SliverToBoxAdapter(
+                  child: _NotificationTestCard()
+                      .animate()
+                      .fadeIn(delay: 100.ms)
+                      .slideY(begin: 0.1),
+                ),
+
+                const SliverToBoxAdapter(child: SizedBox(height: 12)),
 
                 // ── App Info Card ──
                 SliverToBoxAdapter(
-                  child: _InfoCard(
+                  child: const _InfoCard(
                     title: 'ABOUT',
                     children: [
                       _InfoRow(
@@ -86,7 +109,7 @@ class SettingsScreen extends StatelessWidget {
 
                 // ── Team Card ──
                 SliverToBoxAdapter(
-                  child: _InfoCard(
+                  child: const _InfoCard(
                     title: 'TEAM',
                     children: [
                       _InfoRow(
@@ -113,6 +136,22 @@ class SettingsScreen extends StatelessWidget {
                     builder: (context, state, _) {
                       return _InfoCard(
                         title: 'DEVICE LOCATION',
+                        action: state.locationDeniedForever
+                            ? _ActionButton(
+                                label: 'Open Settings',
+                                icon: Icons.settings_rounded,
+                                onTap: () => state.openAppSettings(),
+                              )
+                            : (state.locationName == 'GPS Off' ||
+                                    state.locationName == 'Location Denied' ||
+                                    state.locationName == 'Location Error' ||
+                                    state.locationName == 'GPS Timeout')
+                                ? _ActionButton(
+                                    label: 'Retry Location',
+                                    icon: Icons.refresh_rounded,
+                                    onTap: () => state.retryLocation(),
+                                  )
+                                : null,
                         children: [
                           _InfoRow(
                             icon: Icons.place_rounded,
@@ -130,22 +169,6 @@ class SettingsScreen extends StatelessWidget {
                                 : AppTheme.offline,
                           ),
                         ],
-                        action: state.locationDeniedForever
-                            ? _ActionButton(
-                                label: 'Open Settings',
-                                icon: Icons.settings_rounded,
-                                onTap: () => state.openAppSettings(),
-                              )
-                            : (state.locationName == 'GPS Off' ||
-                                    state.locationName == 'Location Denied' ||
-                                    state.locationName == 'Location Error' ||
-                                    state.locationName == 'GPS Timeout')
-                                ? _ActionButton(
-                                    label: 'Retry Location',
-                                    icon: Icons.refresh_rounded,
-                                    onTap: () => state.retryLocation(),
-                                  )
-                                : null,
                       );
                     },
                   ).animate().fadeIn(delay: 300.ms).slideY(begin: 0.1),
@@ -184,7 +207,7 @@ class _Header extends StatelessWidget {
         border: Border.all(color: AppTheme.cardBorder),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.heroAcc.withOpacity(0.06),
+            color: AppTheme.heroAcc.withValues(alpha: 0.06),
             blurRadius: 18,
             offset: const Offset(0, 4),
           ),
@@ -270,7 +293,7 @@ class _InfoCard extends StatelessWidget {
         border: Border.all(color: AppTheme.cardBorder),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.heroAcc.withOpacity(0.06),
+            color: AppTheme.heroAcc.withValues(alpha: 0.06),
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
@@ -321,7 +344,7 @@ class _InfoRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(icon, color: AppTheme.subtext.withOpacity(0.6), size: 16),
+        Icon(icon, color: AppTheme.subtext.withValues(alpha: 0.6), size: 16),
         const SizedBox(width: 10),
         Text(
           label,
@@ -367,9 +390,9 @@ class _ActionButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
-          color: AppTheme.heroAcc.withOpacity(0.12),
+          color: AppTheme.heroAcc.withValues(alpha: 0.12),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppTheme.heroAcc.withOpacity(0.3)),
+          border: Border.all(color: AppTheme.heroAcc.withValues(alpha: 0.3)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -415,7 +438,7 @@ class _Phase2Card extends StatelessWidget {
         border: Border.all(color: AppTheme.cardBorder),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.heroAcc.withOpacity(0.06),
+            color: AppTheme.heroAcc.withValues(alpha: 0.06),
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
@@ -440,7 +463,7 @@ class _Phase2Card extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: AppTheme.heroAcc.withOpacity(0.12),
+                  color: AppTheme.heroAcc.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Text(
@@ -464,11 +487,11 @@ class _Phase2Card extends StatelessWidget {
                       width: 34,
                       height: 34,
                       decoration: BoxDecoration(
-                        color: AppTheme.subtext.withOpacity(0.08),
+                        color: AppTheme.subtext.withValues(alpha: 0.08),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Icon(item.$1,
-                          color: AppTheme.subtext.withOpacity(0.4),
+                          color: AppTheme.subtext.withValues(alpha: 0.4),
                           size: 16),
                     ),
                     const SizedBox(width: 12),
@@ -479,7 +502,7 @@ class _Phase2Card extends StatelessWidget {
                           Text(
                             item.$2,
                             style: GoogleFonts.outfit(
-                              color: AppTheme.subtext.withOpacity(0.6),
+                              color: AppTheme.subtext.withValues(alpha: 0.6),
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
                             ),
@@ -487,7 +510,7 @@ class _Phase2Card extends StatelessWidget {
                           Text(
                             item.$3,
                             style: GoogleFonts.outfit(
-                              color: AppTheme.subtext.withOpacity(0.35),
+                              color: AppTheme.subtext.withValues(alpha: 0.35),
                               fontSize: 10,
                             ),
                           ),
@@ -495,7 +518,7 @@ class _Phase2Card extends StatelessWidget {
                       ),
                     ),
                     Icon(Icons.lock_outline_rounded,
-                        color: AppTheme.subtext.withOpacity(0.2), size: 14),
+                        color: AppTheme.subtext.withValues(alpha: 0.2), size: 14),
                   ],
                 ),
               )),
@@ -504,3 +527,488 @@ class _Phase2Card extends StatelessWidget {
     );
   }
 }
+
+// ─── Campus Account Profile Card ─────────────────────────────────────
+class _CampusAccountCard extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final state = context.watch<AppState>();
+    final displayName = state.userDisplayName;
+    final email = state.userEmail;
+    final role = state.userCampusRole;
+    final photoUrl = state.userPhotoUrl;
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppTheme.cardSolid,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: AppTheme.cardBorder),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.heroAcc.withValues(alpha: 0.06),
+            blurRadius: 18,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(
+                'AKUN KAMPUS PARAMADINA',
+                style: GoogleFonts.outfit(
+                  color: AppTheme.subtext,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 1.2,
+                ),
+              ),
+              const Spacer(),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: AppTheme.online.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(999),
+                  border: Border.all(
+                    color: AppTheme.online.withValues(alpha: 0.3),
+                    width: 1,
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.verified_rounded,
+                        color: AppTheme.online, size: 12),
+                    const SizedBox(width: 4),
+                    Text(
+                      'TERVERIFIKASI',
+                      style: GoogleFonts.outfit(
+                        color: AppTheme.online,
+                        fontSize: 8,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.8,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              // Avatar with fallback
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppTheme.heroAcc.withValues(alpha: 0.12),
+                  border: Border.all(
+                    color: AppTheme.heroAcc.withValues(alpha: 0.4),
+                    width: 1.5,
+                  ),
+                ),
+                child: ClipOval(
+                  child: photoUrl != null
+                      ? Image.network(
+                          photoUrl,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => _DefaultAvatar(displayName),
+                        )
+                      : _DefaultAvatar(displayName),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      displayName.isNotEmpty ? displayName : 'Sivitas Paramadina',
+                      style: GoogleFonts.outfit(
+                        color: AppTheme.text,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      email.isNotEmpty ? email : 'Tidak ada email',
+                      style: GoogleFonts.outfit(
+                        color: AppTheme.subtext,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      role,
+                      style: GoogleFonts.outfit(
+                        color: AppTheme.heroAcc,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          const Divider(height: 1, color: AppTheme.divider),
+          const SizedBox(height: 12),
+          // Logout Button
+          InkWell(
+            onTap: () => _confirmLogout(context),
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+              decoration: BoxDecoration(
+                color: AppTheme.offline.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: AppTheme.offline.withValues(alpha: 0.2),
+                  width: 1,
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.logout_rounded,
+                    color: AppTheme.offline,
+                    size: 16,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Keluar dari Akun Kampus',
+                    style: GoogleFonts.outfit(
+                      color: AppTheme.offline,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _confirmLogout(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: const BorderSide(color: AppTheme.cardBorder),
+        ),
+        title: Text(
+          'Keluar Akun?',
+          style: GoogleFonts.outfit(
+            color: AppTheme.text,
+            fontWeight: FontWeight.w700,
+            fontSize: 18,
+          ),
+        ),
+        content: Text(
+          'Anda akan keluar dari sesi akun Universitas Paramadina. Anda perlu login kembali untuk mengakses data sensor banjir.',
+          style: GoogleFonts.outfit(
+            color: AppTheme.subtext,
+            fontSize: 13,
+            height: 1.4,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(
+              'Batal',
+              style: GoogleFonts.outfit(
+                color: AppTheme.subtext,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.of(ctx).pop();
+              final state = Provider.of<AppState>(context, listen: false);
+              await state.signOut();
+              if (context.mounted) {
+                Navigator.of(context).pushAndRemoveUntil(
+                  PageRouteBuilder(
+                    pageBuilder: (_, __, ___) => const LoginScreen(),
+                    transitionsBuilder: (_, anim, __, child) =>
+                        FadeTransition(opacity: anim, child: child),
+                    transitionDuration: const Duration(milliseconds: 400),
+                  ),
+                  (route) => false,
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.offline,
+              foregroundColor: Colors.white,
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            child: Text(
+              'Keluar',
+              style: GoogleFonts.outfit(
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DefaultAvatar extends StatelessWidget {
+  final String name;
+  const _DefaultAvatar(this.name);
+
+  @override
+  Widget build(BuildContext context) {
+    final initial = name.isNotEmpty ? name.trim()[0].toUpperCase() : 'U';
+    return Center(
+      child: Text(
+        initial,
+        style: GoogleFonts.outfit(
+          color: AppTheme.heroAcc,
+          fontSize: 20,
+          fontWeight: FontWeight.w800,
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Notification Testing Card ───────────────────────────────────────
+class _NotificationTestCard extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppTheme.cardSolid,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: AppTheme.cardBorder),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.heroAcc.withValues(alpha: 0.06),
+            blurRadius: 18,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(
+                'EARLY WARNING PUSH NOTIFICATION',
+                style: GoogleFonts.outfit(
+                  color: AppTheme.subtext,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 1.2,
+                ),
+              ),
+              const Spacer(),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: AppTheme.online.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.notifications_active_rounded,
+                        color: AppTheme.online, size: 12),
+                    const SizedBox(width: 4),
+                    Text(
+                      'FCM AKTIF',
+                      style: GoogleFonts.outfit(
+                        color: AppTheme.online,
+                        fontSize: 8,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.8,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Text(
+            'Sistem terhubung ke Firebase Cloud Messaging (Topic: paramadina_flood_alerts) untuk menyiarkan peringatan darurat otomatis ke HP sivitas kampus saat air kanal naik.',
+            style: GoogleFonts.outfit(
+              color: AppTheme.subtext,
+              fontSize: 12,
+              height: 1.4,
+            ),
+          ),
+          const SizedBox(height: 14),
+          // Test button
+          InkWell(
+            onTap: () async {
+              await NotificationService.sendTestFloodAlert();
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    backgroundColor: const Color(0xFF0F172A),
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    content: Row(
+                      children: [
+                        const Icon(Icons.check_circle_rounded,
+                            color: AppTheme.online, size: 20),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            'Simulasi notifikasi banjir terkirim! Cek bilah notifikasi HP Anda.',
+                            style: GoogleFonts.outfit(
+                              color: Colors.white,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }
+            },
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 11, horizontal: 14),
+              decoration: BoxDecoration(
+                color: AppTheme.heroAcc.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: AppTheme.heroAcc.withValues(alpha: 0.3),
+                  width: 1.2,
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.notification_important_rounded,
+                    color: AppTheme.heroAcc,
+                    size: 18,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Uji Coba Notifikasi Darurat Banjir',
+                    style: GoogleFonts.outfit(
+                      color: AppTheme.heroAcc,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 10),
+          // Voice Broadcast Test Button
+          InkWell(
+            onTap: () async {
+              await VoiceAlertService.testVoiceAlert();
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    backgroundColor: const Color(0xFF0F172A),
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    content: Row(
+                      children: [
+                        const Icon(Icons.volume_up_rounded,
+                            color: AppTheme.heroAcc, size: 20),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            'Menyiarkan suara sirine & pengumuman darurat...',
+                            style: GoogleFonts.outfit(
+                              color: Colors.white,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }
+            },
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 11, horizontal: 14),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF97316).withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: const Color(0xFFF97316).withValues(alpha: 0.3),
+                  width: 1.2,
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.record_voice_over_rounded,
+                    color: Color(0xFFF97316),
+                    size: 18,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Uji Coba Pengumuman Suara (TTS Sirine)',
+                    style: GoogleFonts.outfit(
+                      color: const Color(0xFFF97316),
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+

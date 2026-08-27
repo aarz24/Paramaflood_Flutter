@@ -1,6 +1,5 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../services/app_theme.dart';
 import '../widgets/ai_chat_panel.dart';
@@ -44,50 +43,54 @@ class _MainShellState extends State<MainShell> {
             children: _screens,
           ),
 
-          // 🤖 Floating AI Button — High Contrast Vibrant Water Blue Pill
+          // 🤖 Floating AI Button — positioned just above the bottom nav bar
           Positioned(
-            right: 16,
-            bottom: 90,
-            child: GestureDetector(
-              onTap: _openAiChat,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF0284C7), Color(0xFF0EA5E9)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(30),
-                  border: Border.all(color: Colors.white, width: 1.5),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFF0EA5E9).withValues(alpha: 0.40),
-                      blurRadius: 16,
-                      spreadRadius: 1,
-                      offset: const Offset(0, 6),
+            left: 20,
+            right: 20,
+            bottom: 84, // Just above the bottom nav bar (margin 18 + nav ~48 + gap 18)
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: GestureDetector(
+                onTap: _openAiChat,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF0284C7), Color(0xFF0EA5E9)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
                     ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Icons.auto_awesome_rounded,
-                      color: Colors.white,
-                      size: 19,
-                    ),
-                    const SizedBox(width: 7),
-                    Text(
-                      'Tanya ParaBot AI',
-                      style: GoogleFonts.outfit(
-                        color: Colors.white,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 0.3,
+                    borderRadius: BorderRadius.circular(30),
+                    border: Border.all(color: Colors.white, width: 1.5),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF0EA5E9).withValues(alpha: 0.40),
+                        blurRadius: 16,
+                        spreadRadius: 1,
+                        offset: const Offset(0, 4),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.auto_awesome_rounded,
+                        color: Colors.white,
+                        size: 19,
+                      ),
+                      const SizedBox(width: 7),
+                      Text(
+                        'Tanya ParaBot AI',
+                        style: GoogleFonts.outfit(
+                          color: Colors.white,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.3,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

@@ -1,11 +1,17 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../models/weather_data.dart';
+import '../services/auth_service.dart';
 import '../services/firebase_service.dart';
 import '../services/gemini_service.dart';
 import '../services/location_weather_service.dart';
+import '../services/notification_service.dart';
+import '../services/siren_service.dart';
+import '../services/voice_alert_service.dart';
 
 class AppState extends ChangeNotifier {
+  final _auth     = AuthService();
   final _firebase = FirebaseService();
   final _locSvc   = LocationWeatherService();
   final _gemini   = GeminiService();
@@ -30,6 +36,12 @@ class AppState extends ChangeNotifier {
   bool   _isReportLoading = false;
   String _smartAlert = '';
   DateTime? _lastAlertTime;
+
+  // Structured AI fields (compact card format)
+  String _aiCuaca = '';  // 1-line weather summary
+  String _aiAir   = '';  // 1-line water status
+  String _aiSaran = '';  // 1-line recommendation
+  String _aiDetail = ''; // 2-3 sentence detailed analysis
   final List<Map<String, String>> _chatMessages = [];
 
   StreamSubscription<WeatherData>?       _liveSub;
@@ -50,6 +62,20 @@ class AppState extends ChangeNotifier {
   bool              get hasReceivedLiveData => _hasReceivedLiveData;
   bool              get hasReceivedHistory  => _hasReceivedHistory;
 
+  // ── Auth Getters ──────────────────────────────────────────────
+  AuthService       get auth            => _auth;
+  User?             get currentUser     => _auth.currentUser;
+  bool              get isAuthenticated => _auth.isAuthenticated;
+  String            get userDisplayName => _auth.currentUser?.displayName ?? 'Sivitas Paramadina';
+  String            get userEmail       => _auth.currentUser?.email ?? '';
+  String?           get userPhotoUrl    => _auth.currentUser?.photoURL;
+  String            get userCampusRole  => AuthService.getCampusRole(_auth.currentUser?.email);
+
+  Future<void> signOut() async {
+    await _auth.signOut();
+    notifyListeners();
+  }
+
   // ── AI Getters ────────────────────────────────────────────────
   String get aiAnalysis      => _aiAnalysis;
   String get floodRiskLevel  => _floodRiskLevel;
@@ -61,6 +87,13 @@ class AppState extends ChangeNotifier {
   String get smartAlert      => _smartAlert;
   bool   get isAiConfigured  => _gemini.isConfigured;
   List<Map<String, String>> get chatMessages => List.unmodifiable(_chatMessages);
+
+  // Structured AI getters
+  String get aiCuaca  => _aiCuaca;
+  String get aiAir    => _aiAir;
+  String get aiSaran  => _aiSaran;
+  String get aiDetail => _aiDetail;
+  bool   get hasStructuredAi => _aiCuaca.isNotEmpty || _aiAir.isNotEmpty;
 
   Future<void> init() async {
     // ── Firebase live stream — updates every ~1 second ──────────
@@ -140,6 +173,10 @@ class AppState extends ChangeNotifier {
       } else {
         _floodRiskLevel = risk;
         _aiAnalysis = res['analysis'] ?? 'Tidak ada analisis.';
+        _aiCuaca = res['cuaca'] ?? '';
+        _aiAir = res['air'] ?? '';
+        _aiSaran = res['saran'] ?? '';
+        _aiDetail = res['detail'] ?? '';
       }
     } catch (e) {
       _aiError = 'Gagal memproses AI: $e';
@@ -204,10 +241,24 @@ class AppState extends ChangeNotifier {
     }
     if (alertType == null) return;
 
-    _lastAlertTime = DateTime.now();
-    _smartAlert =
-        await _gemini.generateSmartAlert(current: d, alertType: alertType);
-    notifyListeners();
+    // 🚨 Air Raid Siren trigger: water reached sensor tip (distance <= 20cm)
+    if (d.distance > 0 && d.distance <= 20.0) {
+      SirenService.startAirRaidSiren();
+      VoiceAlertService.speakFloodAlert(
+        waterLevelCm: d.waterLevel,
+        riskLevel: 'KRITIS',
+      );
+    } else if (d.distance > 25.0 && SirenService.isPlaying) {
+      SirenService.stopAirRaidSiren();
+    }
+
+    // Trigger push notification if water level or rain is hazardous
+    NotificationService.checkSensorAlert(
+      waterLevelCm: d.waterLevel,
+      rainMm: d.rain,
+      riskLevel: _floodRiskLevel,
+      distanceCm: d.distance,
+    );
   }
 
   Future<void> _refreshInternet() async {

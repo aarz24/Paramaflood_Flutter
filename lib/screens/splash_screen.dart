@@ -4,6 +4,8 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/app_theme.dart';
+import '../services/auth_service.dart';
+import 'login_screen.dart';
 import 'onboarding_screen.dart';
 import 'main_shell.dart';
 
@@ -43,12 +45,21 @@ class _SplashScreenState extends State<SplashScreen>
 
     final prefs = await SharedPreferences.getInstance();
     final seen = prefs.getBool('onboarding_seen') ?? false;
+    final isAuth = AuthService().isAuthenticated;
+
+    Widget nextScreen;
+    if (isAuth) {
+      nextScreen = const MainShell();
+    } else if (!seen) {
+      nextScreen = const OnboardingScreen();
+    } else {
+      nextScreen = const LoginScreen();
+    }
 
     if (!mounted) return;
     Navigator.of(context).pushReplacement(
       PageRouteBuilder(
-        pageBuilder: (_, __, ___) =>
-            seen ? const MainShell() : const OnboardingScreen(),
+        pageBuilder: (_, __, ___) => nextScreen,
         transitionsBuilder: (_, anim, __, child) =>
             FadeTransition(opacity: anim, child: child),
         transitionDuration: const Duration(milliseconds: 600),
@@ -77,7 +88,7 @@ class _SplashScreenState extends State<SplashScreen>
                   colors: [
                     AppTheme.bg,
                     AppTheme.bgAlt,
-                    AppTheme.colDist.withOpacity(0.08),
+                    AppTheme.colDist.withValues(alpha: 0.08),
                   ],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
@@ -111,8 +122,8 @@ class _SplashScreenState extends State<SplashScreen>
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    AppTheme.colDist.withOpacity(0.2),
-                    AppTheme.colDist.withOpacity(0.0),
+                    AppTheme.colDist.withValues(alpha: 0.2),
+                    AppTheme.colDist.withValues(alpha: 0.0),
                   ],
                 ),
               ),
@@ -130,8 +141,8 @@ class _SplashScreenState extends State<SplashScreen>
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    AppTheme.heroAcc.withOpacity(0.15),
-                    AppTheme.heroAcc.withOpacity(0.0),
+                    AppTheme.heroAcc.withValues(alpha: 0.15),
+                    AppTheme.heroAcc.withValues(alpha: 0.0),
                   ],
                 ),
               ),
@@ -150,10 +161,10 @@ class _SplashScreenState extends State<SplashScreen>
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(24),
                     border:
-                        Border.all(color: AppTheme.colDist.withOpacity(0.4), width: 1.5),
+                        Border.all(color: AppTheme.colDist.withValues(alpha: 0.4), width: 1.5),
                     boxShadow: [
                       BoxShadow(
-                        color: AppTheme.colDist.withOpacity(0.35),
+                        color: AppTheme.colDist.withValues(alpha: 0.35),
                         blurRadius: 30,
                         spreadRadius: 5,
                       ),
@@ -235,7 +246,7 @@ class _SplashScreenState extends State<SplashScreen>
                   height: 28,
                   child: CircularProgressIndicator(
                     strokeWidth: 2.5,
-                    color: AppTheme.heroAcc.withOpacity(0.6),
+                    color: AppTheme.heroAcc.withValues(alpha: 0.6),
                   ),
                 ).animate().fadeIn(delay: 1000.ms, duration: 400.ms),
               ],
@@ -251,7 +262,7 @@ class _SplashScreenState extends State<SplashScreen>
               'Universitas Paramadina · 2026',
               textAlign: TextAlign.center,
               style: GoogleFonts.outfit(
-                color: AppTheme.subtext.withOpacity(0.5),
+                color: AppTheme.subtext.withValues(alpha: 0.5),
                 fontSize: 10,
                 letterSpacing: 1,
               ),
@@ -282,7 +293,7 @@ class _SplashWavePainter extends CustomPainter {
 
     // Back wave
     final paint1 = Paint()
-      ..color = AppTheme.colDist.withOpacity(0.08)
+      ..color = AppTheme.colDist.withValues(alpha: 0.08)
       ..style = PaintingStyle.fill;
 
     final path1 = Path();
@@ -301,7 +312,7 @@ class _SplashWavePainter extends CustomPainter {
 
     // Front wave
     final paint2 = Paint()
-      ..color = AppTheme.colDist.withOpacity(0.15)
+      ..color = AppTheme.colDist.withValues(alpha: 0.15)
       ..style = PaintingStyle.fill;
 
     final path2 = Path();

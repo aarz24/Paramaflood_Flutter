@@ -24,7 +24,7 @@ class ComparisonPanel extends StatelessWidget {
         border: Border.all(color: AppTheme.cardBorder),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.heroAcc.withOpacity(0.06),
+            color: AppTheme.heroAcc.withValues(alpha: 0.06),
             blurRadius: 20,
             offset: const Offset(0, 8),
           )
@@ -36,7 +36,7 @@ class ComparisonPanel extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
-                color: AppTheme.heroAcc.withOpacity(0.12),
+                color: AppTheme.heroAcc.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(999),
               ),
               child: Text('SENSOR vs INTERNET',
@@ -78,12 +78,6 @@ class ComparisonPanel extends StatelessWidget {
               internet!.windSpeed,
               '${internet!.windSpeed.toStringAsFixed(1)} m/s',
               AppTheme.colWind, 0, 20),
-          const SizedBox(height: 8),
-          _compareRow('PRESSURE', sensor.pres,
-              '${sensor.pres.toStringAsFixed(0)} hPa',
-              internet!.pressure,
-              '${internet!.pressure.toStringAsFixed(0)} hPa',
-              AppTheme.colPres, 950, 1050),
           const SizedBox(height: 12),
           _analysisSummary(),
         ],
@@ -111,7 +105,7 @@ class ComparisonPanel extends StatelessWidget {
         width: 70,
         child: Text(label,
             style: GoogleFonts.outfit(
-                color: color.withOpacity(0.8),
+                color: color.withValues(alpha: 0.8),
                 fontSize: 8, letterSpacing: 1)),
       ),
       Expanded(
@@ -125,9 +119,9 @@ class ComparisonPanel extends StatelessWidget {
       Container(
         padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
         decoration: BoxDecoration(
-          color: diffColor.withOpacity(0.15),
+          color: diffColor.withValues(alpha: 0.15),
           borderRadius: BorderRadius.circular(4),
-          border: Border.all(color: diffColor.withOpacity(0.5)),
+          border: Border.all(color: diffColor.withValues(alpha: 0.5)),
         ),
         child: Text(diffStr,
             style: GoogleFonts.outfit(
@@ -183,8 +177,8 @@ class ComparisonPanel extends StatelessWidget {
       issues.add(
           'Humidity Δ${(sensor.hum - internet!.hum).abs().toStringAsFixed(0)}% — indoor vs outdoor?');
     }
-    if (sensor.pres < 990) {
-      issues.add('Low pressure — possible storm approaching');
+    if (sensor.distance > 0 && sensor.distance < 20) {
+      issues.add('Air kanal tinggi — risiko banjir meningkat');
     }
     if (sensor.temp > 35 && sensor.hum > 70) {
       issues.add('Heat stress risk — high heat index');
@@ -195,7 +189,7 @@ class ComparisonPanel extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppTheme.bg,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppTheme.heroAcc.withOpacity(0.25)),
+        border: Border.all(color: AppTheme.heroAcc.withValues(alpha: 0.25)),
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
@@ -272,26 +266,24 @@ class _HistoryChartState extends State<HistoryChart>
 
   // (label, color, unit, icon)
   static const _cfg = [
-    ('SUHU', AppTheme.colTemp,  '°C',  Icons.thermostat_rounded),
-    ('KELEMBABAN',  AppTheme.colHum,   '%',   Icons.water_drop_rounded),
-    ('TEKANAN', AppTheme.colPres,  'hPa', Icons.compress_rounded),
-    ('ANGIN', AppTheme.colWind,  'm/s', Icons.air_rounded),
     ('KETINGGIAN AIR', AppTheme.colDist,  'cm',  Icons.waves_rounded),
-    ('BATERAI', AppTheme.colBatt,  'V',   Icons.battery_charging_full_rounded),
-    ('CAHAYA', AppTheme.colLight, 'lx', Icons.wb_sunny_rounded),
-    ('HUJAN', AppTheme.colRain,  'mm',  Icons.grain_rounded),
+    ('HUJAN',          AppTheme.colRain,  'mm',  Icons.grain_rounded),
+    ('SUHU',           AppTheme.colTemp,  '°C',  Icons.thermostat_rounded),
+    ('KELEMBABAN',     AppTheme.colHum,   '%',   Icons.water_drop_rounded),
+    ('ANGIN',          AppTheme.colWind,  'm/s', Icons.air_rounded),
+    ('CAHAYA',         AppTheme.colLight, 'lx',  Icons.wb_sunny_rounded),
+    ('BATERAI',        AppTheme.colBatt,  'V',   Icons.battery_charging_full_rounded),
   ];
 
   List<double> get _vals {
     return switch (_tab) {
-      0 => widget.history.map((e) => e.temp).toList(),
-      1 => widget.history.map((e) => e.hum).toList(),
-      2 => widget.history.map((e) => e.pres).toList(),
-      3 => widget.history.map((e) => e.wind).toList(),
-      4 => widget.history.map((e) => e.distance).toList(),
-      5 => widget.history.map((e) => e.battery).toList(),
-      6 => widget.history.map((e) => e.light).toList(),
-      7 => widget.history.map((e) => e.rain).toList(),
+      0 => widget.history.map((e) => e.distance).toList(),
+      1 => widget.history.map((e) => e.rain).toList(),
+      2 => widget.history.map((e) => e.temp).toList(),
+      3 => widget.history.map((e) => e.hum).toList(),
+      4 => widget.history.map((e) => e.wind).toList(),
+      5 => widget.history.map((e) => e.light).toList(),
+      6 => widget.history.map((e) => e.battery).toList(),
       _ => [],
     };
   }
@@ -309,7 +301,7 @@ class _HistoryChartState extends State<HistoryChart>
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppTheme.cardBorder),
         boxShadow: [
-          BoxShadow(color: color.withOpacity(0.06), blurRadius: 20, spreadRadius: 2),
+          BoxShadow(color: color.withValues(alpha: 0.06), blurRadius: 20, spreadRadius: 2),
         ],
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -332,7 +324,7 @@ class _HistoryChartState extends State<HistoryChart>
 
         const SizedBox(height: 10),
 
-        // ── 4 tab boxes in a 2×2 grid ───────────────────────────
+        // ── Sensor tab boxes in a 2-column grid ──────────────────
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: GridView.builder(
@@ -353,14 +345,13 @@ class _HistoryChartState extends State<HistoryChart>
               double? cur;
               if (widget.history.isNotEmpty) {
                 cur = switch (i) {
-                  0 => widget.history.last.temp,
-                  1 => widget.history.last.hum,
-                  2 => widget.history.last.pres,
-                  3 => widget.history.last.wind,
-                  4 => widget.history.last.distance,
-                  5 => widget.history.last.battery,
-                  6 => widget.history.last.light,
-                  7 => widget.history.last.rain,
+                  0 => widget.history.last.distance,
+                  1 => widget.history.last.rain,
+                  2 => widget.history.last.temp,
+                  3 => widget.history.last.hum,
+                  4 => widget.history.last.wind,
+                  5 => widget.history.last.light,
+                  6 => widget.history.last.battery,
                   _ => null,
                 };
               }
@@ -372,7 +363,7 @@ class _HistoryChartState extends State<HistoryChart>
                   curve: Curves.easeOut,
                   decoration: BoxDecoration(
                     color: isActive
-                        ? tabColor.withOpacity(0.10)
+                        ? tabColor.withValues(alpha: 0.10)
                         : AppTheme.bgAlt,
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
@@ -384,7 +375,7 @@ class _HistoryChartState extends State<HistoryChart>
                     boxShadow: isActive
                         ? [
                             BoxShadow(
-                                color: tabColor.withOpacity(0.15),
+                                color: tabColor.withValues(alpha: 0.15),
                                 blurRadius: 12,
                                 spreadRadius: 1)
                           ]
@@ -398,13 +389,13 @@ class _HistoryChartState extends State<HistoryChart>
                       Container(
                         padding: const EdgeInsets.all(5),
                         decoration: BoxDecoration(
-                          color: tabColor.withOpacity(isActive ? 0.15 : 0.08),
+                          color: tabColor.withValues(alpha: isActive ? 0.15 : 0.08),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Icon(
                           cfg.$4,
                           size: isActive ? 16 : 14,
-                          color: isActive ? tabColor : tabColor.withOpacity(0.5),
+                          color: isActive ? tabColor : tabColor.withValues(alpha: 0.5),
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -417,7 +408,7 @@ class _HistoryChartState extends State<HistoryChart>
                                 style: GoogleFonts.outfit(
                                     color: isActive
                                         ? tabColor
-                                        : tabColor.withOpacity(0.5),
+                                        : tabColor.withValues(alpha: 0.5),
                                     fontSize: 9,
                                     letterSpacing: 1.2,
                                     fontWeight: isActive
@@ -429,7 +420,7 @@ class _HistoryChartState extends State<HistoryChart>
                                 style: GoogleFonts.outfit(
                                     color: isActive
                                         ? tabColor
-                                        : tabColor.withOpacity(0.4),
+                                        : tabColor.withValues(alpha: 0.4),
                                     fontSize: 10,
                                     fontWeight: FontWeight.bold),
                               ),
@@ -446,7 +437,7 @@ class _HistoryChartState extends State<HistoryChart>
                               borderRadius: BorderRadius.circular(2),
                               boxShadow: [
                                 BoxShadow(
-                                    color: tabColor.withOpacity(0.3),
+                                    color: tabColor.withValues(alpha: 0.3),
                                     blurRadius: 6)
                               ]),
                         ),
@@ -508,7 +499,7 @@ class _HistoryChartState extends State<HistoryChart>
                 getTitlesWidget: (v, _) => Text(
                   v.toStringAsFixed(0),
                   style: GoogleFonts.outfit(
-                      color: color.withOpacity(0.6), fontSize: 8),
+                      color: color.withValues(alpha: 0.6), fontSize: 8),
                 ),
               ),
             ),
@@ -557,7 +548,7 @@ class _HistoryChartState extends State<HistoryChart>
               belowBarData: BarAreaData(
                 show: true,
                 gradient: LinearGradient(
-                  colors: [color.withOpacity(0.25), Colors.transparent],
+                  colors: [color.withValues(alpha: 0.25), Colors.transparent],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                 ),
@@ -628,8 +619,8 @@ class WeatherAnalyticsPanel extends StatelessWidget {
             _card('KONDISI CUACA', sensor.condition,
                 internet != null
                     ? 'Internet: ${internet!.conditionLabel}'
-                    : sensor.presLabel,
-                AppTheme.colPres),
+                    : 'Sensor: ${sensor.distanceLabel}',
+                AppTheme.colRain),
             _card('KUALITAS UDARA', sensor.airQualityLabel,
                 'Kelembaban ${sensor.hum.toStringAsFixed(0)}%  Suhu ${sensor.temp.toStringAsFixed(1)}°C',
                 _aqColor(sensor.airQualityLabel)),
@@ -637,9 +628,9 @@ class WeatherAnalyticsPanel extends StatelessWidget {
               _card('TREN SUHU',
                   _trend(history.map((e) => e.temp).toList()),
                   '${history.length} pembacaan terakhir', AppTheme.colTemp),
-              _card('TREN TEKANAN',
-                  _trend(history.map((e) => e.pres).toList()),
-                  history.last.presLabel, AppTheme.colPres),
+              _card('TREN HUJAN',
+                  _trend(history.map((e) => e.rain).toList()),
+                  '${history.last.rain.toStringAsFixed(1)} mm', AppTheme.colRain),
               _card('TREN AIR',
                   _trend(history.map((e) => 400.0 - e.distance).toList()),
                   history.last.distanceLabel, AppTheme.colDist),
@@ -661,7 +652,7 @@ class WeatherAnalyticsPanel extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           border: Border(left: BorderSide(color: color, width: 3)),
           boxShadow: [
-            BoxShadow(color: color.withOpacity(0.06), blurRadius: 10)
+            BoxShadow(color: color.withValues(alpha: 0.06), blurRadius: 10)
           ],
         ),
         child: Column(
@@ -670,7 +661,7 @@ class WeatherAnalyticsPanel extends StatelessWidget {
           children: [
             Text(title,
                 style: GoogleFonts.outfit(
-                    color: color.withOpacity(0.7),
+                    color: color.withValues(alpha: 0.7),
                     fontSize: 7, letterSpacing: 1)),
             Text(value,
                 style: GoogleFonts.outfit(

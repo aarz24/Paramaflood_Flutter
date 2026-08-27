@@ -13,12 +13,18 @@ dependencies:
 
   # Firebase
   firebase_core: ^2.24.2
+  firebase_auth: ^4.17.8
   firebase_database: ^10.4.4
+  firebase_messaging: ^14.7.10
+  flutter_local_notifications: ^17.0.0
+  google_sign_in: ^6.2.1
 
-  # UI / Charts
+  # UI / Charts / Audio
   fl_chart: ^0.66.2
   google_fonts: ^6.1.0
   flutter_animate: ^4.5.0
+  flutter_tts: ^3.8.5
+  audioplayers: ^5.2.1
 
   # Location & time
   geolocator: ^11.0.0
@@ -48,6 +54,7 @@ flutter:
 
   assets:
     - assets/images/
+    - assets/audio/
     - assets/images/splashscreen.png
     - assets/images/splashscreen.jpg
     - assets/images/splashscreen.jpeg

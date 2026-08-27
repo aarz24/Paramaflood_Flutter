@@ -108,6 +108,11 @@ class WeatherData {
     return 'EXTREME';
   }
 
+  /// Convert raw sensor distance to water level (cm).
+  /// Sensor is mounted ~100 cm above canal floor.
+  /// waterLevel = sensorHeight − distance.
+  double get waterLevel => distance > 0 ? (100.0 - distance).clamp(0.0, 100.0) : 0.0;
+
   String get distanceLabel {
     if (distance <= 0) return 'ERROR'; // Assuming -1 or 0 means timeout/error from ESP32
     if (distance < 20.0) return 'CRITICAL';

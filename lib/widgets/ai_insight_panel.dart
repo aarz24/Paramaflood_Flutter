@@ -5,10 +5,17 @@ import 'package:provider/provider.dart';
 import '../services/app_state.dart';
 import '../services/app_theme.dart';
 
-/// 🧠 Panel Analisis AI Gemini — Fitur 1 & 2 (analisis cuaca + risiko banjir)
-/// + Fitur 4 (laporan harian) + Fitur 5 (banner notifikasi cerdas).
-class AiInsightPanel extends StatelessWidget {
+/// 🧠 Panel Analisis AI Gemini — Compact structured card layout.
+/// Shows 3 mini-cards (Cuaca, Air, Saran) + expandable detail.
+class AiInsightPanel extends StatefulWidget {
   const AiInsightPanel({super.key});
+
+  @override
+  State<AiInsightPanel> createState() => _AiInsightPanelState();
+}
+
+class _AiInsightPanelState extends State<AiInsightPanel> {
+  bool _showDetail = false;
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +30,7 @@ class AiInsightPanel extends StatelessWidget {
         border: Border.all(color: AppTheme.cardBorder),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.heroAcc.withOpacity(0.06),
+            color: AppTheme.heroAcc.withValues(alpha: 0.06),
             blurRadius: 20,
             spreadRadius: 2,
             offset: const Offset(0, 4),
@@ -96,9 +103,9 @@ class AiInsightPanel extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: AppTheme.offline.withOpacity(0.08),
+                color: AppTheme.offline.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: AppTheme.offline.withOpacity(0.25)),
+                border: Border.all(color: AppTheme.offline.withValues(alpha: 0.25)),
               ),
               child: Row(
                 children: [
@@ -131,7 +138,7 @@ class AiInsightPanel extends StatelessWidget {
           const SizedBox(height: 14),
 
           // ── Content ──────────────────────────────────────────────
-          if (state.isAiLoading && state.aiAnalysis.isEmpty)
+          if (state.isAiLoading && state.aiAnalysis.isEmpty && !state.hasStructuredAi)
             Center(
               child: Padding(
                 padding: const EdgeInsets.all(24),
@@ -150,7 +157,7 @@ class AiInsightPanel extends StatelessWidget {
                 ),
               ),
             )
-          else if (state.aiAnalysis.isEmpty)
+          else if (state.aiAnalysis.isEmpty && !state.hasStructuredAi)
             Center(
               child: Padding(
                 padding: const EdgeInsets.all(12),
@@ -184,11 +191,112 @@ class AiInsightPanel extends StatelessWidget {
                 ),
               ),
             )
+          // ── NEW: Structured mini-cards layout ───────────────────
+          else if (state.hasStructuredAi) ...[
+            // 🌤 Cuaca Card
+            _InsightMiniCard(
+              icon: Icons.wb_sunny_rounded,
+              iconColor: const Color(0xFFF59E0B),
+              label: 'CUACA',
+              content: state.aiCuaca,
+            ),
+            const SizedBox(height: 8),
+            // 💧 Status Air Card
+            _InsightMiniCard(
+              icon: Icons.water_rounded,
+              iconColor: const Color(0xFF3B82F6),
+              label: 'STATUS AIR',
+              content: state.aiAir,
+            ),
+            const SizedBox(height: 8),
+            // ✅ Rekomendasi Card
+            _InsightMiniCard(
+              icon: Icons.shield_rounded,
+              iconColor: _saranColor(state.floodRiskLevel),
+              label: 'REKOMENDASI',
+              content: state.aiSaran,
+            ),
+
+            // Expandable detail section
+            if (state.aiDetail.isNotEmpty) ...[
+              const SizedBox(height: 10),
+              GestureDetector(
+                onTap: () => setState(() => _showDetail = !_showDetail),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: AppTheme.heroAcc.withValues(alpha: 0.05),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: AppTheme.heroAcc.withValues(alpha: 0.15),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        _showDetail
+                            ? Icons.expand_less_rounded
+                            : Icons.expand_more_rounded,
+                        color: AppTheme.heroAcc,
+                        size: 18,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        _showDetail ? 'Sembunyikan Detail' : 'Selengkapnya...',
+                        style: GoogleFonts.outfit(
+                          color: AppTheme.heroAcc,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              AnimatedCrossFade(
+                firstChild: const SizedBox.shrink(),
+                secondChild: Padding(
+                  padding: const EdgeInsets.only(top: 10),
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: AppTheme.bgAlt.withValues(alpha: 0.5),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: AppTheme.divider),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Icon(Icons.info_outline_rounded,
+                            color: AppTheme.subtext, size: 14),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: SelectableText(
+                            state.aiDetail,
+                            style: GoogleFonts.outfit(
+                              color: AppTheme.text.withValues(alpha: 0.8),
+                              fontSize: 12,
+                              height: 1.5,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                crossFadeState: _showDetail
+                    ? CrossFadeState.showSecond
+                    : CrossFadeState.showFirst,
+                duration: const Duration(milliseconds: 250),
+              ),
+            ],
+          ]
+          // ── LEGACY: Plain text fallback ─────────────────────────
           else
             SelectableText(
               state.aiAnalysis,
               style: GoogleFonts.outfit(
-                color: AppTheme.text.withOpacity(0.92),
+                color: AppTheme.text.withValues(alpha: 0.92),
                 fontSize: 13,
                 height: 1.55,
               ),
@@ -241,7 +349,7 @@ class AiInsightPanel extends StatelessWidget {
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppTheme.heroAcc,
                     side: BorderSide(
-                        color: AppTheme.heroAcc.withOpacity(0.35)),
+                        color: AppTheme.heroAcc.withValues(alpha: 0.35)),
                     textStyle: GoogleFonts.outfit(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
@@ -256,6 +364,15 @@ class AiInsightPanel extends StatelessWidget {
     );
   }
 
+  Color _saranColor(String level) {
+    switch (level.toUpperCase()) {
+      case 'KRITIS': return const Color(0xFFEF4444);
+      case 'TINGGI': return const Color(0xFFF97316);
+      case 'SEDANG': return const Color(0xFFF59E0B);
+      default:       return const Color(0xFF10B981);
+    }
+  }
+
   void _showDailyReportSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -263,6 +380,75 @@ class AiInsightPanel extends StatelessWidget {
       backgroundColor: Colors.transparent,
       builder: (_) => const _DailyReportSheet(),
     );
+  }
+}
+
+/// Individual mini-card for a single AI insight row.
+class _InsightMiniCard extends StatelessWidget {
+  final IconData icon;
+  final Color iconColor;
+  final String label;
+  final String content;
+
+  const _InsightMiniCard({
+    required this.icon,
+    required this.iconColor,
+    required this.label,
+    required this.content,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (content.isEmpty) return const SizedBox.shrink();
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: iconColor.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: iconColor.withValues(alpha: 0.15)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: iconColor.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, color: iconColor, size: 16),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: GoogleFonts.outfit(
+                    color: iconColor,
+                    fontSize: 9,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 1.2,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  content,
+                  style: GoogleFonts.outfit(
+                    color: AppTheme.text,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    height: 1.35,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    ).animate().fadeIn(duration: 200.ms).slideX(begin: 0.03);
   }
 }
 
@@ -308,9 +494,9 @@ class _RiskBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: bg.withOpacity(0.10),
+        color: bg.withValues(alpha: 0.10),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: bg.withOpacity(0.5)),
+        border: Border.all(color: bg.withValues(alpha: 0.5)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -390,7 +576,7 @@ class _DailyReportSheet extends StatelessWidget {
                           ? 'Menyiapkan laporan...'
                           : state.dailyReport,
                       style: GoogleFonts.outfit(
-                        color: AppTheme.text.withOpacity(0.92),
+                        color: AppTheme.text.withValues(alpha: 0.92),
                         fontSize: 13,
                         height: 1.6,
                       ),

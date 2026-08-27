@@ -3,7 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/app_theme.dart';
-import 'main_shell.dart';
+import 'login_screen.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -49,7 +49,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     if (!mounted) return;
     Navigator.of(context).pushReplacement(
       PageRouteBuilder(
-        pageBuilder: (_, __, ___) => const MainShell(),
+        pageBuilder: (_, __, ___) => const LoginScreen(),
         transitionsBuilder: (_, anim, __, child) =>
             FadeTransition(opacity: anim, child: child),
         transitionDuration: const Duration(milliseconds: 500),
@@ -72,7 +72,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       body: Stack(
         children: [
           // ── Background gradient ──
-          Positioned.fill(
+          const Positioned.fill(
             child: DecoratedBox(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -133,7 +133,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         borderRadius: BorderRadius.circular(4),
                         color: i == _currentPage
                             ? _pages[_currentPage].accent
-                            : AppTheme.subtext.withOpacity(0.3),
+                            : AppTheme.subtext.withValues(alpha: 0.3),
                       ),
                     ),
                   ),
@@ -158,13 +158,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor:
-                            _pages[_currentPage].accent.withOpacity(0.2),
+                            _pages[_currentPage].accent.withValues(alpha: 0.2),
                         foregroundColor: _pages[_currentPage].accent,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                           side: BorderSide(
                             color:
-                                _pages[_currentPage].accent.withOpacity(0.4),
+                                _pages[_currentPage].accent.withValues(alpha: 0.4),
                           ),
                         ),
                         elevation: 0,
@@ -203,16 +203,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               borderRadius: BorderRadius.circular(36),
               gradient: LinearGradient(
                 colors: [
-                  page.accent.withOpacity(0.2),
-                  page.accent.withOpacity(0.05),
+                  page.accent.withValues(alpha: 0.2),
+                  page.accent.withValues(alpha: 0.05),
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
-              border: Border.all(color: page.accent.withOpacity(0.25)),
+              border: Border.all(color: page.accent.withValues(alpha: 0.25)),
               boxShadow: [
                 BoxShadow(
-                  color: page.accent.withOpacity(0.2),
+                  color: page.accent.withValues(alpha: 0.2),
                   blurRadius: 40,
                   spreadRadius: 5,
                 ),

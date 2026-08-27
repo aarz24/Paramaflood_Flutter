@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import '../config/api_keys.dart';
@@ -20,7 +21,7 @@ class GeminiService {
 
   GeminiService() {
     _model = GenerativeModel(
-      model: 'gemini-2.5-flash',
+      model: 'gemini-3.6-flash',
       apiKey: ApiKeys.geminiApiKey,
       generationConfig: GenerationConfig(
         temperature: 0.6,
@@ -268,15 +269,15 @@ DATA CUACA INTERNET (${internet?.location ?? 'Tidak tersedia'}):
 - Kondisi: ${internet?.conditionLabel ?? 'Tidak ada data'}
 
 TUGAS KAMU:
-WAJIB balas HANYA dengan format persis di bawah ini. Baris PERTAMA HARUS diawali "[RISK_LEVEL]:". DILARANG memakai format markdown (jangan gunakan ** atau #).
+BALAS HANYA dengan JSON valid (tanpa markdown code fence, tanpa teks lain) dengan format PERSIS seperti ini:
+{"risk":"RENDAH|SEDANG|TINGGI|KRITIS","cuaca":"<1 kalimat ringkas kondisi cuaca saat ini dengan emoji & angka, contoh: ☀️ Cerah 30.2°C, kelembaban 79%, angin tenang>","air":"<1 kalimat status air kanal dengan tren, contoh: 💧 Ketinggian 63 cm, tren naik perlahan +2 cm>","saran":"<1 kalimat rekomendasi aksi konkret dengan emoji, contoh: ✅ Aman beraktivitas di lantai dasar>","detail":"<2-3 kalimat analisis teknis singkat untuk pembaca yang ingin info lebih lanjut, sebutkan korelasi antar sensor & data internet>"}
 
-[RISK_LEVEL]: <Pilih SATU: RENDAH | SEDANG | TINGGI | KRITIS>
-[ANALYSIS]:
-<Tuliskan 2-3 paragraf singkat (maksimal 200 kata) dalam Bahasa Indonesia berisi:
-1. Ringkasan kondisi saat ini & analisis korelasi antar sensor (bandingkan juga dengan data internet).
-2. Penjelasan tingkat risiko banjir berdasarkan tren air & hujan.
-3. Rekomendasi tindakan konkret untuk warga/pengguna stasiun cuaca.
-Gunakan angka spesifik dari data. Jangan jawab generik. Gunakan emoji untuk kejelasan visual.>
+ATURAN:
+1. Setiap field WAJIB singkat (maks 15 kata per field, kecuali detail maks 40 kata).
+2. Gunakan angka spesifik dari data sensor. Jangan jawab generik.
+3. Awali setiap field dengan emoji yang relevan.
+4. DILARANG pakai format markdown (tanpa ** atau #).
+5. Field "risk" HARUS salah satu dari: RENDAH, SEDANG, TINGGI, KRITIS.
 ''';
   }
 
@@ -352,35 +353,71 @@ Kondisi Cuaca: ${d.condition} | Kualitas Udara: ${d.airQualityLabel}
     }
   }
 
-  // ── Helper: Parse output AI [RISK_LEVEL] + [ANALYSIS] ───────────
+  // ── Helper: Parse output AI — JSON structured format ────────────
   Map<String, String> _parseAiResponse(String raw) {
+    // Strip markdown code fences if model wraps JSON in ```json ... ```
+    String cleaned = raw.trim();
+    cleaned = cleaned.replaceAll(RegExp(r'^```(?:json)?\s*', multiLine: true), '');
+    cleaned = cleaned.replaceAll(RegExp(r'```\s*$', multiLine: true), '');
+    cleaned = cleaned.trim();
+
+    try {
+      // Try parsing as JSON first (new structured format)
+      final jsonStart = cleaned.indexOf('{');
+      final jsonEnd = cleaned.lastIndexOf('}');
+      if (jsonStart != -1 && jsonEnd > jsonStart) {
+        final jsonStr = cleaned.substring(jsonStart, jsonEnd + 1);
+        final Map<String, dynamic> parsed =
+            Map<String, dynamic>.from(_parseJsonManual(jsonStr));
+        return {
+          'risk': _riskFromText((parsed['risk'] ?? 'RENDAH').toString().toUpperCase()),
+          'cuaca': _clean(parsed['cuaca']?.toString() ?? ''),
+          'air': _clean(parsed['air']?.toString() ?? ''),
+          'saran': _clean(parsed['saran']?.toString() ?? ''),
+          'detail': _clean(parsed['detail']?.toString() ?? ''),
+          'analysis': '', // Not used anymore in structured mode
+        };
+      }
+    } catch (e) {
+      debugPrint('JSON parse failed, falling back to legacy: $e');
+    }
+
+    // Legacy fallback: [RISK_LEVEL] + [ANALYSIS] format
     String risk;
     String analysis = raw;
-
     if (raw.contains('[RISK_LEVEL]:')) {
       final parts = raw.split('[ANALYSIS]:');
       final riskLine = parts[0].replaceAll('[RISK_LEVEL]:', '').trim();
       risk = _riskFromText(riskLine.toUpperCase());
-      if (parts.length > 1) {
-        analysis = parts[1].trim();
-      }
+      if (parts.length > 1) analysis = parts[1].trim();
     } else {
-      // Fallback: model tidak mengikuti format header —
-      // simpulkan level risiko dari isi teks agar badge tidak salah.
       risk = _riskFromText(raw.toUpperCase());
     }
+    return {
+      'risk': risk,
+      'analysis': _clean(analysis),
+      'cuaca': '',
+      'air': '',
+      'saran': '',
+      'detail': '',
+    };
+  }
 
-    return {'risk': risk, 'analysis': _clean(analysis)};
+  /// Simple JSON parser that handles the expected flat structure.
+  /// Uses dart:convert but wrapped for safety.
+  Map<String, dynamic> _parseJsonManual(String jsonStr) {
+    // Use Dart's built-in JSON decoder
+    return Map<String, dynamic>.from(
+      (const JsonDecoder()).convert(jsonStr) as Map,
+    );
   }
 
   // ── Helper: Simpulkan level risiko dari teks bebas ──────────────
   String _riskFromText(String upper) {
-    // Kata kunci level eksplisit didahulukan (urutan = prioritas).
     if (upper.contains('KRITIS')) return 'KRITIS';
     if (upper.contains('TINGGI')) return 'TINGGI';
     if (upper.contains('SEDANG')) return 'SEDANG';
     if (upper.contains('RENDAH')) return 'RENDAH';
-    // Tidak ada level eksplisit → infer dari kata bahaya.
     const bahayaTinggi = [
       'EVAKUASI', 'SEGERA MENGUNGSI', 'PERINGATAN BADAI',
       'PERINGATAN BANJIR', 'BANJIR!', 'BAHAYA'

@@ -315,8 +315,8 @@ class _HeroPanelState extends State<HeroPanel> with SingleTickerProviderStateMix
                       children: [
                         _chip(Icons.thermostat_rounded, '${widget.live.temp.toStringAsFixed(1)}°C'),
                         _chip(Icons.water_drop_rounded, '${widget.live.hum.toStringAsFixed(0)}%'),
+                        _chip(Icons.grain_rounded, '${widget.live.rain.toStringAsFixed(1)} mm'),
                         _chip(Icons.air_rounded, '${widget.live.wind.toStringAsFixed(1)} m/s'),
-                        _chip(Icons.compress_rounded, '${(widget.live.pres / 10).toStringAsFixed(1)} kPa'),
                         _chip(Icons.sync_rounded, '#${widget.frameCount % 9999}'),
                       ],
                     ),

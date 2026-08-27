@@ -1,4 +1,3 @@
-import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -45,8 +44,8 @@ class HistoryScreen extends StatelessWidget {
                   shape: BoxShape.circle,
                   gradient: RadialGradient(
                     colors: [
-                      AppTheme.colPres.withOpacity(0.12),
-                      AppTheme.colPres.withOpacity(0.0),
+                      AppTheme.colDist.withValues(alpha: 0.10),
+                      AppTheme.colDist.withValues(alpha: 0.0),
                     ],
                   ),
                 ),
@@ -174,14 +173,14 @@ class _Header extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            AppTheme.card.withOpacity(0.72),
-            AppTheme.cardSolid.withOpacity(0.92),
+            AppTheme.card.withValues(alpha: 0.72),
+            AppTheme.cardSolid.withValues(alpha: 0.92),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
       ),
       child: Row(
         children: [
