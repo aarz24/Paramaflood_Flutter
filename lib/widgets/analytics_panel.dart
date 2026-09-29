@@ -587,14 +587,20 @@ class WeatherAnalyticsPanel extends StatelessWidget {
           mainAxisSpacing: 10,
           childAspectRatio: 1.5,
           children: [
-            _card('HEAT INDEX', '${sensor.feelsLike.toStringAsFixed(1)}°C',
-                'Suhu terasa', AppTheme.colTemp),
             _card(
+                Icons.thermostat_rounded,
+                'HEAT INDEX',
+                '${sensor.feelsLike.toStringAsFixed(1)}°C',
+                'Suhu terasa',
+                AppTheme.colTemp),
+            _card(
+                Icons.air_rounded,
                 'KEKUATAN ANGIN',
                 _beaufort(sensor.wind),
                 '${sensor.wind.toStringAsFixed(1)} m/s  (${(sensor.wind * 3.6).toStringAsFixed(1)} km/h)',
                 AppTheme.colWind),
             _card(
+                Icons.cloud_rounded,
                 'KONDISI CUACA',
                 sensor.condition,
                 internet != null
@@ -602,24 +608,32 @@ class WeatherAnalyticsPanel extends StatelessWidget {
                     : 'Sensor: ${sensor.distanceLabel}',
                 AppTheme.colRain),
             _card(
+                Icons.eco_rounded,
                 'KUALITAS UDARA',
                 sensor.airQualityLabel,
                 'Kelembaban ${sensor.hum.toStringAsFixed(0)}%  Suhu ${sensor.temp.toStringAsFixed(1)}°C',
                 _aqColor(sensor.airQualityLabel)),
             if (history.length >= 3) ...[
-              _card('TREN SUHU', _trend(history.map((e) => e.temp).toList()),
-                  '${history.length} pembacaan terakhir', AppTheme.colTemp),
               _card(
+                  Icons.device_thermostat_rounded,
+                  'TREN SUHU',
+                  _trend(history.map((e) => e.temp).toList()),
+                  '${history.length} pembacaan terakhir',
+                  AppTheme.colTemp),
+              _card(
+                  Icons.water_drop_rounded,
                   'TREN HUJAN',
                   _trend(history.map((e) => e.rain).toList()),
                   '${history.last.rain.toStringAsFixed(1)} mm',
                   AppTheme.colRain),
               _card(
+                  Icons.waves_rounded,
                   'TREN AIR',
                   _trend(history.map((e) => 400.0 - e.distance).toList()),
                   history.last.distanceLabel,
                   AppTheme.colDist),
               _card(
+                  Icons.battery_charging_full_rounded,
                   'TREN BATERAI',
                   _trend(history.map((e) => e.battery).toList()),
                   history.last.batteryLabel,
@@ -631,7 +645,8 @@ class WeatherAnalyticsPanel extends StatelessWidget {
     );
   }
 
-  Widget _card(String title, String value, String sub, Color color) =>
+  Widget _card(
+          IconData icon, String title, String value, String sub, Color color) =>
       Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
@@ -658,17 +673,40 @@ class WeatherAnalyticsPanel extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(title,
-                style: GoogleFonts.outfit(
-                    color: color.withValues(alpha: 0.7),
-                    fontSize: 7,
-                    letterSpacing: 1)),
+            Row(children: [
+              Container(
+                width: 24,
+                height: 24,
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.14),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(icon, size: 14, color: color),
+              ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.outfit(
+                        color: color,
+                        fontSize: 9,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.8)),
+              ),
+            ]),
             Text(value,
                 style: GoogleFonts.outfit(
-                    color: color, fontSize: 14, fontWeight: FontWeight.bold),
+                    color: AppTheme.text,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -0.3),
+                maxLines: 1,
                 overflow: TextOverflow.ellipsis),
             Text(sub,
-                style: GoogleFonts.outfit(color: AppTheme.subtext, fontSize: 8),
+                style:
+                    GoogleFonts.outfit(color: AppTheme.subtext, fontSize: 10),
+                maxLines: 1,
                 overflow: TextOverflow.ellipsis),
           ],
         ),

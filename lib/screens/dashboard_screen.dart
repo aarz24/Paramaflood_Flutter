@@ -193,21 +193,58 @@ class DashboardScreen extends StatelessWidget {
                         SliverToBoxAdapter(
                           child: Container(
                             margin: const EdgeInsets.symmetric(horizontal: 16),
-                            padding: const EdgeInsets.all(16),
+                            padding: const EdgeInsets.all(14),
                             decoration: BoxDecoration(
-                              color: AppTheme.heroAcc.withValues(alpha: 0.08),
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: AppTheme.heroAcc.withValues(alpha: 0.25)),
+                              color: AppTheme.cardSolid,
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: (data.error.isNotEmpty
+                                        ? AppTheme.offline
+                                        : AppTheme.heroAcc)
+                                    .withValues(alpha: 0.25),
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: (data.error.isNotEmpty
+                                          ? AppTheme.offline
+                                          : AppTheme.heroAcc)
+                                      .withValues(alpha: 0.08),
+                                  blurRadius: 16,
+                                  offset: const Offset(0, 6),
+                                ),
+                              ],
                             ),
                             child: Row(
                               children: [
-                                const SizedBox(
-                                  width: 18, height: 18,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: AppTheme.heroAcc,
+                                Container(
+                                  width: 42,
+                                  height: 42,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: (data.error.isNotEmpty
+                                            ? AppTheme.offline
+                                            : AppTheme.heroAcc)
+                                        .withValues(alpha: 0.12),
                                   ),
-                                ),
+                                  child: Icon(
+                                    data.error.isNotEmpty
+                                        ? Icons.wifi_off_rounded
+                                        : Icons.sensors_rounded,
+                                    size: 22,
+                                    color: data.error.isNotEmpty
+                                        ? AppTheme.offline
+                                        : AppTheme.heroAcc,
+                                  ),
+                                )
+                                    .animate(
+                                        onPlay: (c) =>
+                                            c.repeat(reverse: true))
+                                    .scale(
+                                      begin: const Offset(1, 1),
+                                      end: const Offset(1.1, 1.1),
+                                      duration: 1200.ms,
+                                      curve: Curves.easeInOut,
+                                    ),
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Column(
