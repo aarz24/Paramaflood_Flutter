@@ -83,16 +83,16 @@ class SettingsScreen extends StatelessWidget {
                 // ── App Info Card ──
                 SliverToBoxAdapter(
                   child: const _InfoCard(
-                    title: 'ABOUT',
+                    title: 'TENTANG APLIKASI',
                     icon: Icons.info_rounded,
                     children: [
                       _InfoRow(
                           icon: Icons.water_drop_rounded,
-                          label: 'App Name',
+                          label: 'Nama Aplikasi',
                           value: 'ParamaFlood Monitor'),
                       _InfoRow(
                           icon: Icons.tag_rounded,
-                          label: 'Version',
+                          label: 'Versi',
                           value: '2.0.0 (Phase 1)'),
                       _InfoRow(
                           icon: Icons.memory_rounded,
@@ -100,7 +100,7 @@ class SettingsScreen extends StatelessWidget {
                           value: 'ESP32 + Flutter + Firebase'),
                       _InfoRow(
                           icon: Icons.school_rounded,
-                          label: 'Institution',
+                          label: 'Institusi',
                           value: 'Universitas Paramadina'),
                     ],
                   ).animate().fadeIn(delay: 100.ms).slideY(begin: 0.1),
@@ -111,20 +111,20 @@ class SettingsScreen extends StatelessWidget {
                 // ── Team Card ──
                 SliverToBoxAdapter(
                   child: const _InfoCard(
-                    title: 'TEAM',
+                    title: 'TIM PENGEMBANG',
                     icon: Icons.groups_rounded,
                     children: [
                       _InfoRow(
                           icon: Icons.person_rounded,
-                          label: 'Researcher',
+                          label: 'Peneliti',
                           value: 'Arya'),
                       _InfoRow(
                           icon: Icons.person_rounded,
-                          label: 'Researcher',
+                          label: 'Peneliti',
                           value: 'Aril'),
                       _InfoRow(
                           icon: Icons.person_rounded,
-                          label: 'Researcher',
+                          label: 'Peneliti',
                           value: 'Naina'),
                     ],
                   ).animate().fadeIn(delay: 200.ms).slideY(begin: 0.1),
@@ -137,11 +137,11 @@ class SettingsScreen extends StatelessWidget {
                   child: Consumer<AppState>(
                     builder: (context, state, _) {
                       return _InfoCard(
-                        title: 'DEVICE LOCATION',
+                        title: 'LOKASI PERANGKAT',
                     icon: Icons.my_location_rounded,
                         action: state.locationDeniedForever
                             ? _ActionButton(
-                                label: 'Open Settings',
+                                label: 'Buka Pengaturan',
                                 icon: Icons.settings_rounded,
                                 onTap: () => state.openAppSettings(),
                               )
@@ -150,7 +150,7 @@ class SettingsScreen extends StatelessWidget {
                                     state.locationName == 'Location Error' ||
                                     state.locationName == 'GPS Timeout')
                                 ? _ActionButton(
-                                    label: 'Retry Location',
+                                    label: 'Coba Lagi Lokasi',
                                     icon: Icons.refresh_rounded,
                                     onTap: () => state.retryLocation(),
                                   )
@@ -158,12 +158,12 @@ class SettingsScreen extends StatelessWidget {
                         children: [
                           _InfoRow(
                             icon: Icons.place_rounded,
-                            label: 'Location',
+                            label: 'Lokasi',
                             value: state.locationName,
                           ),
                           _InfoRow(
                             icon: Icons.sensors_rounded,
-                            label: 'Sensor Status',
+                            label: 'Status Sensor',
                             value: state.live.isOnline
                                 ? 'Online'
                                 : 'Offline',
@@ -417,14 +417,14 @@ class _ActionButton extends StatelessWidget {
 // ─── Phase 2 preview card ────────────────────────────────────────────
 class _Phase2Card extends StatelessWidget {
   static const _upcoming = [
-    (Icons.notifications_active_rounded, 'Push Notifications',
-        'Real-time flood alerts via FCM'),
-    (Icons.psychology_rounded, 'LSTM Predictions',
-        'AI-powered water level forecasting'),
-    (Icons.download_rounded, 'Data Export',
-        'Export history to CSV / PDF'),
-    (Icons.translate_rounded, 'Bahasa Indonesia',
-        'Full app localization'),
+    (Icons.notifications_active_rounded, 'Notifikasi Push',
+        'Peringatan banjir real-time via FCM'),
+    (Icons.psychology_rounded, 'Prediksi LSTM',
+        'Prakiraan ketinggian air berbasis AI'),
+    (Icons.download_rounded, 'Ekspor Data',
+        'Ekspor riwayat ke CSV / PDF'),
+    (Icons.translate_rounded, 'Multi Bahasa',
+        'Pilihan bahasa Indonesia & Inggris'),
   ];
 
   @override
@@ -450,7 +450,7 @@ class _Phase2Card extends StatelessWidget {
           Row(
             children: [
               Text(
-                'COMING IN PHASE 2',
+                'SEGERA HADIR · FASE 2',
                 style: GoogleFonts.outfit(
                   color: AppTheme.heroAcc,
                   fontSize: 10,
@@ -467,7 +467,7 @@ class _Phase2Card extends StatelessWidget {
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Text(
-                  'NEXT SEMESTER',
+                  'SEMESTER DEPAN',
                   style: GoogleFonts.outfit(
                     color: AppTheme.heroAcc,
                     fontSize: 8,
