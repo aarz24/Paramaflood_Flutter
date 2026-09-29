@@ -384,7 +384,7 @@ class _LoginScreenState extends State<LoginScreen>
                     // ── Feature highlights ──
                     const Wrap(
                       alignment: WrapAlignment.center,
-                      spacing: 8,
+                      spacing: 6,
                       runSpacing: 8,
                       children: [
                         _FeatureChip(icon: Icons.sensors_rounded, label: 'Sensor IoT', color: AppTheme.colDist),
@@ -608,7 +608,7 @@ class _FeatureChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
       decoration: BoxDecoration(
         color: AppTheme.cardSolid,
         borderRadius: BorderRadius.circular(999),
@@ -625,7 +625,7 @@ class _FeatureChip extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, color: color, size: 14),
-          const SizedBox(width: 6),
+          const SizedBox(width: 5),
           Text(
             label,
             style: GoogleFonts.outfit(

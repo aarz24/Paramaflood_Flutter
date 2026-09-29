@@ -230,7 +230,18 @@ class _AiChatPanelState extends State<AiChatPanel> {
             // ── Input box ──────────────────────────────────────────
             Container(
               padding: const EdgeInsets.all(12),
-              color: AppTheme.cardSolid,
+              decoration: BoxDecoration(
+                color: AppTheme.cardSolid,
+                border:
+                    const Border(top: BorderSide(color: AppTheme.cardBorder)),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppTheme.heroAcc.withValues(alpha: 0.06),
+                    blurRadius: 16,
+                    offset: const Offset(0, -4),
+                  ),
+                ],
+              ),
               child: SafeArea(
                 top: false,
                 child: Row(
@@ -345,46 +356,71 @@ class _AiChatPanelState extends State<AiChatPanel> {
             ),
           ),
           const SizedBox(height: 20),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            alignment: WrapAlignment.center,
-            children: _suggestions
-                .map(
-                  (s) => GestureDetector(
-                    onTap: () => _sendMessage(s),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: AppTheme.heroAcc.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                            color: AppTheme.heroAcc.withValues(alpha: 0.35)),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(Icons.chat_bubble_outline_rounded,
-                              size: 12, color: AppTheme.heroAcc),
-                          const SizedBox(width: 6),
-                          Flexible(
-                            child: Text(
-                              s,
-                              style: GoogleFonts.outfit(
-                                color: AppTheme.heroAcc,
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              'COBA TANYAKAN',
+              style: GoogleFonts.outfit(
+                color: AppTheme.subtext,
+                fontSize: 10,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 1.2,
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          ..._suggestions.asMap().entries.map(
+                (e) => Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Material(
+                    color: AppTheme.cardSolid,
+                    borderRadius: BorderRadius.circular(16),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(16),
+                      onTap: () => _sendMessage(e.value),
+                      child: Container(
+                        padding: const EdgeInsets.fromLTRB(10, 10, 12, 10),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: AppTheme.cardBorder),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 30,
+                              height: 30,
+                              decoration: BoxDecoration(
+                                color: AppTheme.heroAcc.withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: const Icon(
+                                  Icons.chat_bubble_outline_rounded,
+                                  size: 15,
+                                  color: AppTheme.heroAcc),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                e.value,
+                                style: GoogleFonts.outfit(
+                                  color: AppTheme.text,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                            const Icon(Icons.arrow_forward_rounded,
+                                size: 16, color: AppTheme.subtext),
+                          ],
+                        ),
                       ),
                     ),
                   ),
                 )
-                .toList(),
-          ),
+                    .animate()
+                    .fadeIn(delay: (120 + e.key * 70).ms, duration: 300.ms)
+                    .slideX(begin: 0.08),
+              ),
         ],
       ),
     );
