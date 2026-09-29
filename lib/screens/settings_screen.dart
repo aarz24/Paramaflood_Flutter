@@ -417,14 +417,14 @@ class _ActionButton extends StatelessWidget {
 // ─── Phase 2 preview card ────────────────────────────────────────────
 class _Phase2Card extends StatelessWidget {
   static const _upcoming = [
-    (Icons.notifications_active_rounded, 'Push Notifications',
-        'Real-time flood alerts via FCM'),
-    (Icons.psychology_rounded, 'LSTM Predictions',
-        'AI-powered water level forecasting'),
-    (Icons.download_rounded, 'Data Export',
-        'Export history to CSV / PDF'),
-    (Icons.translate_rounded, 'Bahasa Indonesia',
-        'Full app localization'),
+    (Icons.notifications_active_rounded, 'Notifikasi Push',
+        'Peringatan banjir real-time via FCM'),
+    (Icons.psychology_rounded, 'Prediksi LSTM',
+        'Prakiraan ketinggian air berbasis AI'),
+    (Icons.download_rounded, 'Ekspor Data',
+        'Ekspor riwayat ke CSV / PDF'),
+    (Icons.translate_rounded, 'Multi Bahasa',
+        'Pilihan bahasa Indonesia & Inggris'),
   ];
 
   @override
