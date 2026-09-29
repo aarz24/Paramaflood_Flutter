@@ -22,7 +22,7 @@ class _AiInsightPanelState extends State<AiInsightPanel> {
     final state = context.watch<AppState>();
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 12),
+      margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
@@ -46,10 +46,21 @@ class _AiInsightPanelState extends State<AiInsightPanel> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: AppTheme.heroAcc.withValues(alpha: 0.15),
+                  gradient: const LinearGradient(
+                    colors: [AppTheme.heroAcc, AppTheme.colPres],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
                   shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppTheme.colPres.withValues(alpha: 0.3),
+                      blurRadius: 10,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
                 ),
-                child: const Icon(Icons.auto_awesome_rounded, color: AppTheme.heroAcc, size: 18),
+                child: const Icon(Icons.auto_awesome_rounded, color: Colors.white, size: 18),
               ),
               const SizedBox(width: 10),
               Expanded(
@@ -67,7 +78,9 @@ class _AiInsightPanelState extends State<AiInsightPanel> {
                     ),
                     const SizedBox(height: 1),
                     Text(
-                      'Ringkasan Cuaca & Prediksi Banjir',
+                      'Ringkasan & Prediksi Banjir',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.outfit(
                         color: AppTheme.text,
                         fontSize: 14,
@@ -139,23 +152,41 @@ class _AiInsightPanelState extends State<AiInsightPanel> {
 
           // ── Content ──────────────────────────────────────────────
           if (state.isAiLoading && state.aiAnalysis.isEmpty && !state.hasStructuredAi)
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                for (var i = 0; i < 3; i++) ...[
+                  Container(
+                    height: 52,
+                    decoration: BoxDecoration(
+                      color: AppTheme.bgAlt,
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  )
+                      .animate(onPlay: (c) => c.repeat())
+                      .shimmer(
+                        delay: (i * 150).ms,
+                        duration: 1200.ms,
+                        color: Colors.white,
+                      ),
+                  const SizedBox(height: 8),
+                ],
+                const SizedBox(height: 4),
+                Row(
                   children: [
-                    const CircularProgressIndicator(color: AppTheme.heroAcc),
-                    const SizedBox(height: 12),
+                    const Icon(Icons.auto_awesome_rounded, color: AppTheme.colPres, size: 14),
+                    const SizedBox(width: 6),
                     Text(
                       'AI sedang menganalisis data sensor...',
                       style: GoogleFonts.outfit(
                         color: AppTheme.subtext,
                         fontSize: 12,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ],
                 ),
-              ),
+              ],
             )
           else if (state.aiAnalysis.isEmpty && !state.hasStructuredAi)
             Center(
@@ -404,9 +435,16 @@ class _InsightMiniCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: iconColor.withValues(alpha: 0.06),
+        gradient: LinearGradient(
+          colors: [
+            iconColor.withValues(alpha: 0.10),
+            iconColor.withValues(alpha: 0.03),
+          ],
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+        ),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: iconColor.withValues(alpha: 0.15)),
+        border: Border.all(color: iconColor.withValues(alpha: 0.18)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -414,10 +452,17 @@ class _InsightMiniCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
-              color: iconColor.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(8),
+              color: iconColor,
+              borderRadius: BorderRadius.circular(9),
+              boxShadow: [
+                BoxShadow(
+                  color: iconColor.withValues(alpha: 0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
-            child: Icon(icon, color: iconColor, size: 16),
+            child: Icon(icon, color: Colors.white, size: 16),
           ),
           const SizedBox(width: 10),
           Expanded(

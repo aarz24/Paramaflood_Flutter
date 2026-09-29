@@ -66,6 +66,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     final isLast = _currentPage == _pages.length - 1;
+    final accent = _pages[_currentPage].accent;
 
     return Scaffold(
       backgroundColor: AppTheme.bg,
@@ -84,6 +85,29 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ),
           ),
 
+          // ── Accent glow (follows current page) ──
+          Positioned.fill(
+            child: IgnorePointer(
+              child: Align(
+                alignment: const Alignment(0, -0.4),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 500),
+                  width: 460,
+                  height: 460,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: RadialGradient(
+                      colors: [
+                        accent.withValues(alpha: 0.18),
+                        accent.withValues(alpha: 0.0),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+
           // ── Pages ──
           PageView.builder(
             controller: _controller,
@@ -95,20 +119,46 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             },
           ),
 
-          // ── Skip button (top right) ──
+          // ── Step counter (top left) + Skip (top right) ──
           Positioned(
             top: MediaQuery.of(context).padding.top + 12,
+            left: 20,
             right: 16,
-            child: TextButton(
-              onPressed: _finish,
-              child: Text(
-                'Skip',
-                style: GoogleFonts.outfit(
-                  color: AppTheme.subtext,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
+            child: Row(
+              children: [
+                Text(
+                  '${_currentPage + 1} / ${_pages.length}',
+                  style: GoogleFonts.outfit(
+                    color: AppTheme.subtext,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 1,
+                  ),
                 ),
-              ),
+                const Spacer(),
+                AnimatedOpacity(
+                  opacity: isLast ? 0 : 1,
+                  duration: const Duration(milliseconds: 250),
+                  child: TextButton(
+                    onPressed: isLast ? null : _finish,
+                    style: TextButton.styleFrom(
+                      backgroundColor: AppTheme.cardSolid,
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      shape: const StadiumBorder(
+                        side: BorderSide(color: AppTheme.cardBorder),
+                      ),
+                    ),
+                    child: Text(
+                      'Skip',
+                      style: GoogleFonts.outfit(
+                        color: AppTheme.subtext,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
 
@@ -142,39 +192,63 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 // Button
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 40),
-                  child: SizedBox(
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 400),
                     width: double.infinity,
-                    height: 52,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        if (isLast) {
-                          _finish();
-                        } else {
-                          _controller.nextPage(
-                            duration: const Duration(milliseconds: 400),
-                            curve: Curves.easeOutCubic,
-                          );
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            _pages[_currentPage].accent.withValues(alpha: 0.2),
-                        foregroundColor: _pages[_currentPage].accent,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          side: BorderSide(
-                            color:
-                                _pages[_currentPage].accent.withValues(alpha: 0.4),
-                          ),
-                        ),
-                        elevation: 0,
+                    height: 56,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(18),
+                      gradient: LinearGradient(
+                        colors: [
+                          accent,
+                          Color.lerp(accent, AppTheme.colDist, 0.45)!
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
                       ),
-                      child: Text(
-                        isLast ? 'Get Started' : 'Next',
-                        style: GoogleFonts.outfit(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.5,
+                      boxShadow: [
+                        BoxShadow(
+                          color: accent.withValues(alpha: 0.35),
+                          blurRadius: 18,
+                          offset: const Offset(0, 8),
+                        ),
+                      ],
+                    ),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(18),
+                        onTap: () {
+                          if (isLast) {
+                            _finish();
+                          } else {
+                            _controller.nextPage(
+                              duration: const Duration(milliseconds: 400),
+                              curve: Curves.easeOutCubic,
+                            );
+                          }
+                        },
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              isLast ? 'Get Started' : 'Next',
+                              style: GoogleFonts.outfit(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Icon(
+                              isLast
+                                  ? Icons.check_rounded
+                                  : Icons.arrow_forward_rounded,
+                              color: Colors.white,
+                              size: 20,
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -194,7 +268,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const SizedBox(height: 60),
+          const Spacer(flex: 2),
           // ── Icon container with glow ──
           Container(
             width: 120,
@@ -203,23 +277,26 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               borderRadius: BorderRadius.circular(36),
               gradient: LinearGradient(
                 colors: [
-                  page.accent.withValues(alpha: 0.2),
-                  page.accent.withValues(alpha: 0.05),
+                  page.accent,
+                  Color.lerp(page.accent, AppTheme.colDist, 0.45)!,
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
-              border: Border.all(color: page.accent.withValues(alpha: 0.25)),
+              border: Border.all(color: Colors.white, width: 3),
               boxShadow: [
                 BoxShadow(
-                  color: page.accent.withValues(alpha: 0.2),
+                  color: page.accent.withValues(alpha: 0.35),
                   blurRadius: 40,
-                  spreadRadius: 5,
+                  offset: const Offset(0, 16),
                 ),
               ],
             ),
-            child: Icon(page.icon, color: page.iconColor, size: 56),
+            child: Icon(page.icon, color: Colors.white, size: 56),
           )
+              .animate(onPlay: (c) => c.repeat(reverse: true))
+              .moveY(
+                  begin: 0, end: -8, duration: 1800.ms, curve: Curves.easeInOut)
               .animate(key: ValueKey('icon_$index'))
               .scale(
                 begin: const Offset(0.7, 0.7),
@@ -258,7 +335,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               .animate(key: ValueKey('sub_$index'))
               .fadeIn(delay: 300.ms, duration: 400.ms)
               .slideY(begin: 0.15, duration: 400.ms),
-          const Spacer(),
+          const Spacer(flex: 3),
         ],
       ),
     );

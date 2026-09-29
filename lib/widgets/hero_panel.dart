@@ -54,7 +54,7 @@ class _HeroPanelState extends State<HeroPanel> with SingleTickerProviderStateMix
     final fillPct = ((400 - widget.live.distance) / 400).clamp(0.0, 1.0);
 
     return Container(
-      margin: const EdgeInsets.fromLTRB(12, 0, 12, 0),
+      margin: const EdgeInsets.fromLTRB(16, 0, 16, 0),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(28),
         child: BackdropFilter(
@@ -89,7 +89,7 @@ class _HeroPanelState extends State<HeroPanel> with SingleTickerProviderStateMix
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                   ),
-                  borderRadius: BorderRadius.circular(24),
+                  borderRadius: BorderRadius.circular(28),
                   border: Border.all(color: AppTheme.cardBorder, width: 1.25),
                   boxShadow: [
                     BoxShadow(
@@ -197,14 +197,21 @@ class _HeroPanelState extends State<HeroPanel> with SingleTickerProviderStateMix
                               Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    widget.live.distance.toStringAsFixed(0),
-                                    style: GoogleFonts.outfit(
-                                      color: AppTheme.text,
-                                      fontSize: 62,
-                                      fontWeight: FontWeight.w800,
-                                      letterSpacing: -2.0,
-                                      height: 0.95,
+                                  ShaderMask(
+                                    shaderCallback: (bounds) => const LinearGradient(
+                                      colors: [AppTheme.text, AppTheme.colDist],
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                    ).createShader(bounds),
+                                    child: Text(
+                                      widget.live.distance.toStringAsFixed(0),
+                                      style: GoogleFonts.outfit(
+                                        color: Colors.white,
+                                        fontSize: 62,
+                                        fontWeight: FontWeight.w800,
+                                        letterSpacing: -2.0,
+                                        height: 0.95,
+                                      ),
                                     ),
                                   ).animate(key: ValueKey(widget.live.distance.toStringAsFixed(0))).scaleXY(begin: 0.9, duration: 300.ms, curve: Curves.easeOutBack).fadeIn(duration: 250.ms),
                                   Padding(

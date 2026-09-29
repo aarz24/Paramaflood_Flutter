@@ -96,5 +96,40 @@ class AppTheme {
       ),
     ),
     dividerColor: divider,
+    snackBarTheme: SnackBarThemeData(
+      behavior: SnackBarBehavior.floating,
+      backgroundColor: text,
+      elevation: 6,
+      insetPadding: const EdgeInsets.fromLTRB(16, 0, 16, 96),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      contentTextStyle: GoogleFonts.outfit(
+        color: Colors.white,
+        fontSize: 13,
+        fontWeight: FontWeight.w600,
+      ),
+    ),
+    dialogTheme: DialogThemeData(
+      backgroundColor: cardSolid,
+      surfaceTintColor: Colors.transparent,
+      elevation: 12,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(24),
+        side: const BorderSide(color: cardBorder),
+      ),
+      titleTextStyle: GoogleFonts.outfit(
+        color: text,
+        fontSize: 18,
+        fontWeight: FontWeight.w800,
+      ),
+    ),
+    sliderTheme: SliderThemeData(
+      trackHeight: 5,
+      activeTrackColor: heroAcc,
+      inactiveTrackColor: heroAcc.withValues(alpha: 0.15),
+      thumbColor: Colors.white,
+      overlayColor: heroAcc.withValues(alpha: 0.12),
+      thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 9, elevation: 3),
+    ),
+    progressIndicatorTheme: const ProgressIndicatorThemeData(color: heroAcc),
   );
 }

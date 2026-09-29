@@ -1,5 +1,4 @@
 import 'dart:math';
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -35,174 +34,193 @@ class SensorCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final pct = ((value - minVal) / (maxVal - minVal)).clamp(0.0, 1.0);
 
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(20),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-        child: Container(
-          decoration: BoxDecoration(
-            color: AppTheme.cardSolid,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: AppTheme.cardBorder, width: 1),
-            boxShadow: [
-              BoxShadow(
-                color: AppTheme.heroAcc.withValues(alpha: 0.08),
-                blurRadius: 16,
-                offset: const Offset(0, 6),
-              ),
-            ],
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(14),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // ── Header row: Icon badge + Title + Trend ───────
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      child: Row(
-                        children: [
-                          if (icon != null) ...[
-                            Container(
-                              padding: const EdgeInsets.all(6),
-                              decoration: BoxDecoration(
-                                color: color.withValues(alpha: 0.15),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Icon(icon, size: 14, color: color),
-                            ),
-                            const SizedBox(width: 8),
-                          ],
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  title,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: GoogleFonts.outfit(
-                                    color: color,
-                                    fontSize: 11,
-                                    letterSpacing: 1.2,
-                                    fontWeight: FontWeight.w800,
-                                  ),
-                                ),
-                                Text(
-                                  'Sensor ESP32',
-                                  overflow: TextOverflow.ellipsis,
-                                  style: GoogleFonts.outfit(
-                                    color: AppTheme.subtext,
-                                    fontSize: 9,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: color.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(999),
-                      ),
-                      child: Text(
-                        trend,
-                        style: GoogleFonts.outfit(
-                          color: color,
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+    final trendIcon = switch (trend) {
+      '↑' => Icons.trending_up_rounded,
+      '↓' => Icons.trending_down_rounded,
+      _ => Icons.trending_flat_rounded,
+    };
 
-                // ── Arc gauge ─────────────────────────────────────
-                Expanded(
-                  child: CustomPaint(
-                    painter: _PremiumArcPainter(pct: pct, color: color),
-                    child: Center(
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 8),
-                        child: AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 300),
-                          transitionBuilder: (child, anim) =>
-                              ScaleTransition(scale: anim, child: FadeTransition(opacity: anim, child: child)),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(22),
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Color.alphaBlend(color.withValues(alpha: 0.08), AppTheme.cardSolid),
+              AppTheme.cardSolid,
+            ],
+            begin: Alignment.topCenter,
+            end: const Alignment(0, 0.1),
+          ),
+          color: AppTheme.cardSolid,
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(color: color.withValues(alpha: 0.18), width: 1),
+          boxShadow: [
+            BoxShadow(
+              color: color.withValues(alpha: 0.10),
+              blurRadius: 16,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // ── Header row: Icon badge + Title + Trend ───────
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Row(
+                      children: [
+                        if (icon != null) ...[
+                          Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: color.withValues(alpha: 0.15),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Icon(icon, size: 16, color: color),
+                          ),
+                          const SizedBox(width: 8),
+                        ],
+                        Expanded(
                           child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            key: ValueKey(value.toStringAsFixed(1)),
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                value.toStringAsFixed(1),
-                                style: GoogleFonts.outfit(
-                                  color: AppTheme.text,
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.w800,
-                                  letterSpacing: -0.5,
-                                ),
-                              ),
-                              Text(
-                                unit.trim(),
+                                title,
+                                overflow: TextOverflow.ellipsis,
                                 style: GoogleFonts.outfit(
                                   color: color,
                                   fontSize: 11,
-                                  fontWeight: FontWeight.w600,
+                                  letterSpacing: 0.4,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                              Text(
+                                'Sensor ESP32',
+                                overflow: TextOverflow.ellipsis,
+                                style: GoogleFonts.outfit(
+                                  color: AppTheme.subtext,
+                                  fontSize: 9,
                                 ),
                               ),
                             ],
                           ),
                         ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding:
+                        const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: color.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    child: Icon(trendIcon, size: 14, color: color),
+                  ),
+                ],
+              ),
+
+              // ── Arc gauge ─────────────────────────────────────
+              Expanded(
+                child: CustomPaint(
+                  painter: _PremiumArcPainter(pct: pct, color: color),
+                  child: Center(
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 8),
+                      child: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 300),
+                        transitionBuilder: (child, anim) => ScaleTransition(
+                            scale: anim,
+                            child: FadeTransition(opacity: anim, child: child)),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          key: ValueKey(value.toStringAsFixed(1)),
+                          children: [
+                            Text(
+                              value.toStringAsFixed(1),
+                              style: GoogleFonts.outfit(
+                                color: AppTheme.text,
+                                fontSize: 22,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: -0.5,
+                              ),
+                            ),
+                            Text(
+                              unit.trim(),
+                              style: GoogleFonts.outfit(
+                                color: color,
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
                 ),
+              ),
 
-                // ── Label ──────────────────────────────────────────
-                Text(
+              // ── Label ──────────────────────────────────────────
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.10),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Text(
                   label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.outfit(
-                    color: AppTheme.subtext,
+                    color: color,
                     fontSize: 10,
-                    fontWeight: FontWeight.w500,
-                    letterSpacing: 0.5,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.3,
                   ),
                 ),
+              ),
 
-                // ── OpenWeather Compare Badge ──────────────────────
-                if (compareValue != null) ...[
-                  const SizedBox(height: 6),
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-                    decoration: BoxDecoration(
-                      color: AppTheme.internet.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: AppTheme.internet.withValues(alpha: 0.25)),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.cloud_sync_outlined, size: 11, color: AppTheme.internet),
-                        const SizedBox(width: 4),
-                        Text(
-                          'OpenWeather: $compareValue',
-                          style: GoogleFonts.outfit(
-                            color: AppTheme.internet,
-                            fontSize: 9,
-                            fontWeight: FontWeight.w600,
-                          ),
+              // ── OpenWeather Compare Badge ──────────────────────
+              if (compareValue != null) ...[
+                const SizedBox(height: 6),
+                Container(
+                  width: double.infinity,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: AppTheme.internet.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                        color: AppTheme.internet.withValues(alpha: 0.25)),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.cloud_sync_outlined,
+                          size: 11, color: AppTheme.internet),
+                      const SizedBox(width: 4),
+                      Text(
+                        'OpenWeather: $compareValue',
+                        style: GoogleFonts.outfit(
+                          color: AppTheme.internet,
+                          fontSize: 9,
+                          fontWeight: FontWeight.w600,
                         ),
-                      ],
-                    ),
-                  ).animate().fadeIn(duration: 400.ms),
-                ],
+                      ),
+                    ],
+                  ),
+                ).animate().fadeIn(duration: 400.ms),
               ],
-            ),
+            ],
           ),
         ),
       ),
@@ -252,7 +270,7 @@ class _PremiumArcPainter extends CustomPainter {
           ..strokeCap = StrokeCap.round
           ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6),
       );
-      
+
       // Main arc with gradient
       final gradient = SweepGradient(
         startAngle: startAngle,
@@ -260,7 +278,7 @@ class _PremiumArcPainter extends CustomPainter {
         colors: [color.withValues(alpha: 0.5), color],
         stops: const [0.0, 1.0],
       );
-      
+
       canvas.drawArc(
         rect,
         startAngle,
@@ -272,13 +290,15 @@ class _PremiumArcPainter extends CustomPainter {
           ..strokeWidth = 6
           ..strokeCap = StrokeCap.round,
       );
-      
+
       // glowing tip dot
       final na = startAngle + sweep * pct;
       canvas.drawCircle(
-          Offset(cx + r * cos(na), cy + r * sin(na)), 4,
-          Paint()..color = AppTheme.cardSolid
-                 ..maskFilter = const MaskFilter.blur(BlurStyle.solid, 2));
+          Offset(cx + r * cos(na), cy + r * sin(na)),
+          4,
+          Paint()
+            ..color = AppTheme.cardSolid
+            ..maskFilter = const MaskFilter.blur(BlurStyle.solid, 2));
     }
   }
 

@@ -69,17 +69,24 @@ class HistoryScreen extends StatelessWidget {
                   slivers: [
                     // ── Header ──
                     SliverToBoxAdapter(
-                      child: _Header(),
+                      child: _Header(readings: data.history.length),
                     ),
-
                     const SliverToBoxAdapter(child: SizedBox(height: 16)),
+                    SliverToBoxAdapter(
+                      child: _SummaryStrip(history: data.history)
+                          .animate()
+                          .fadeIn(delay: 60.ms)
+                          .slideY(begin: 0.08),
+                    ),
+                    const SliverToBoxAdapter(child: SizedBox(height: 20)),
 
                     // ── Trending History ──
                     const SliverToBoxAdapter(
                       child: _SectionLabel(
-                        title: 'TRENDING HISTORY',
+                        title: 'Tren Riwayat',
+                        icon: Icons.show_chart_rounded,
                         subtitle:
-                            'Rolling sensor history across the last readings',
+                            'Riwayat sensor dari pembacaan terakhir',
                       ),
                     ),
                     SliverToBoxAdapter(
@@ -95,9 +102,10 @@ class HistoryScreen extends StatelessWidget {
                     // ── Live Comparison ──
                     const SliverToBoxAdapter(
                       child: _SectionLabel(
-                        title: 'LIVE COMPARISON',
+                        title: 'Perbandingan Langsung',
+                        icon: Icons.compare_arrows_rounded,
                         subtitle:
-                            'Sensor readings against Open-Meteo for context',
+                            'Data sensor dibandingkan dengan Open-Meteo',
                       ),
                     ),
                     SliverToBoxAdapter(
@@ -112,9 +120,10 @@ class HistoryScreen extends StatelessWidget {
                     // ── Insights ──
                     const SliverToBoxAdapter(
                       child: _SectionLabel(
-                        title: 'INSIGHTS',
+                        title: 'Wawasan Cuaca',
+                        icon: Icons.lightbulb_rounded,
                         subtitle:
-                            'Quick health checks and weather interpretation',
+                            'Pemeriksaan cepat dan interpretasi cuaca',
                       ),
                     ),
                     SliverToBoxAdapter(
@@ -125,7 +134,7 @@ class HistoryScreen extends StatelessWidget {
                       ).animate().fadeIn(delay: 200.ms),
                     ),
 
-                    const SliverToBoxAdapter(child: SizedBox(height: 20)),
+                    const SliverToBoxAdapter(child: SizedBox(height: 110)),
                   ],
                 );
               },
@@ -165,48 +174,35 @@ class _HistoryData {
 
 // ─── Header ──────────────────────────────────────────────────────────
 class _Header extends StatelessWidget {
+  final int readings;
+
+  const _Header({required this.readings});
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.fromLTRB(12, 8, 12, 0),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            AppTheme.card.withValues(alpha: 0.72),
-            AppTheme.cardSolid.withValues(alpha: 0.92),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
-      ),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
       child: Row(
         children: [
-          SizedBox(
-            width: 42,
-            height: 42,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Image.asset(
-                'assets/images/splashscreen.jpg',
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Image.asset(
-                    'assets/images/splashscreen.png',
-                    fit: BoxFit.cover,
-                    errorBuilder: (ctx, err, st) {
-                      return const Icon(
-                        Icons.timeline_rounded,
-                        color: AppTheme.text,
-                        size: 22,
-                      );
-                    },
-                  );
-                },
+          Container(
+            width: 46,
+            height: 46,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(14),
+              gradient: const LinearGradient(
+                colors: [AppTheme.colDist, AppTheme.heroAcc],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
+              boxShadow: [
+                BoxShadow(
+                  color: AppTheme.heroAcc.withValues(alpha: 0.25),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
+            child: const Icon(Icons.timeline_rounded, color: Colors.white, size: 24),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -214,23 +210,33 @@ class _Header extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'History & Analytics',
+                  'Riwayat & Analitik',
                   style: GoogleFonts.outfit(
                     color: AppTheme.text,
-                    fontSize: 18,
+                    fontSize: 19,
                     fontWeight: FontWeight.w800,
-                    letterSpacing: 0.3,
                   ),
                 ),
-                const SizedBox(height: 2),
                 Text(
-                  'Trends, comparisons, and weather insights',
-                  style: GoogleFonts.outfit(
-                    color: AppTheme.subtext,
-                    fontSize: 11,
-                  ),
+                  'Tren, perbandingan, dan wawasan cuaca',
+                  style: GoogleFonts.outfit(color: AppTheme.subtext, fontSize: 11),
                 ),
               ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: AppTheme.heroAcc.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(999),
+            ),
+            child: Text(
+              '$readings data',
+              style: GoogleFonts.outfit(
+                color: AppTheme.heroAcc,
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ),
         ],
@@ -239,36 +245,139 @@ class _Header extends StatelessWidget {
   }
 }
 
-// ─── Section label (reused from dashboard) ──────────────────────────
+// ─── Summary strip ──────────────────────────────────────────────────
+class _SummaryStrip extends StatelessWidget {
+  final List<WeatherData> history;
+
+  const _SummaryStrip({required this.history});
+
+  @override
+  Widget build(BuildContext context) {
+    final hasData = history.isNotEmpty;
+    double avg(double Function(WeatherData) f) =>
+        history.map(f).reduce((a, b) => a + b) / history.length;
+    double maxOf(double Function(WeatherData) f) =>
+        history.map(f).reduce((a, b) => a > b ? a : b);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Row(
+        children: [
+          _stat(Icons.thermostat_rounded, 'Rata-rata Suhu',
+              hasData ? '${avg((d) => d.temp).toStringAsFixed(1)}°C' : '—', AppTheme.colTemp),
+          const SizedBox(width: 10),
+          _stat(Icons.grain_rounded, 'Hujan Maks',
+              hasData ? '${maxOf((d) => d.rain).toStringAsFixed(1)} mm' : '—', AppTheme.colRain),
+          const SizedBox(width: 10),
+          _stat(Icons.water_drop_rounded, 'Rata-rata RH',
+              hasData ? '${avg((d) => d.hum).toStringAsFixed(0)}%' : '—', AppTheme.colHum),
+        ],
+      ),
+    );
+  }
+
+  Widget _stat(IconData icon, String label, String value, Color color) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: AppTheme.cardSolid,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: AppTheme.cardBorder),
+          boxShadow: [
+            BoxShadow(
+              color: color.withValues(alpha: 0.08),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(icon, color: color, size: 16),
+            ),
+            const SizedBox(height: 8),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Text(
+                value,
+                style: GoogleFonts.outfit(
+                  color: AppTheme.text,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
+            Text(
+              label,
+              style: GoogleFonts.outfit(color: AppTheme.subtext, fontSize: 10),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Section label ──────────────────────────────────────────────────
 class _SectionLabel extends StatelessWidget {
   final String title;
   final String subtitle;
+  final IconData icon;
 
-  const _SectionLabel({required this.title, required this.subtitle});
+  const _SectionLabel({
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+      child: Row(
         children: [
-          Text(
-            title,
-            style: GoogleFonts.outfit(
-              color: AppTheme.text,
-              fontSize: 12,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 1.8,
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: AppTheme.heroAcc.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(12),
             ),
+            child: Icon(icon, color: AppTheme.heroAcc, size: 18),
           ),
-          const SizedBox(height: 4),
-          Text(
-            subtitle,
-            style: GoogleFonts.outfit(
-              color: AppTheme.subtext,
-              fontSize: 11,
-              height: 1.25,
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: GoogleFonts.outfit(
+                    color: AppTheme.text,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 1),
+                Text(
+                  subtitle,
+                  style: GoogleFonts.outfit(
+                    color: AppTheme.subtext,
+                    fontSize: 11,
+                    height: 1.25,
+                  ),
+                ),
+              ],
             ),
           ),
         ],

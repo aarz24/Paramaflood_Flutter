@@ -81,7 +81,7 @@ class _WaterCanalVisualizerState extends State<WaterCanalVisualizer>
     final fillFraction = (waterLevel / canalMaxDepthCm).clamp(0.08, 1.05);
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 12),
+      margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
         color: AppTheme.cardSolid,
         borderRadius: BorderRadius.circular(22),
@@ -110,12 +110,23 @@ class _WaterCanalVisualizerState extends State<WaterCanalVisualizer>
                 Container(
                   padding: const EdgeInsets.all(7),
                   decoration: BoxDecoration(
-                    color: statusColor.withValues(alpha: 0.12),
+                    gradient: LinearGradient(
+                      colors: [statusColor.withValues(alpha: 0.75), statusColor],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
                     borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: statusColor.withValues(alpha: 0.3),
+                        blurRadius: 8,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
                   ),
-                  child: Icon(
+                  child: const Icon(
                     Icons.waves_rounded,
-                    color: statusColor,
+                    color: Colors.white,
                     size: 18,
                   ),
                 ),
@@ -240,6 +251,25 @@ class _WaterCanalVisualizerState extends State<WaterCanalVisualizer>
                   ),
                 ),
               ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(99),
+              child: TweenAnimationBuilder<double>(
+                tween: Tween(
+                  end: (waterLevel / canalMaxDepthCm).clamp(0.0, 1.0),
+                ),
+                duration: const Duration(milliseconds: 600),
+                curve: Curves.easeOutCubic,
+                builder: (context, value, _) => LinearProgressIndicator(
+                  value: value,
+                  minHeight: 6,
+                  backgroundColor: statusColor.withValues(alpha: 0.12),
+                  valueColor: AlwaysStoppedAnimation(statusColor),
+                ),
+              ),
             ),
           ),
 

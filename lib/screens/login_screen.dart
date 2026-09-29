@@ -241,6 +241,26 @@ class _LoginScreenState extends State<LoginScreen>
             },
           ),
 
+          Positioned(
+            bottom: -120,
+            left: -100,
+            child: IgnorePointer(
+              child: Container(
+                width: 300,
+                height: 300,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(
+                    colors: [
+                      AppTheme.colPres.withValues(alpha: 0.10),
+                      AppTheme.colPres.withValues(alpha: 0.0),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+
           SafeArea(
             child: Center(
               child: SingleChildScrollView(
@@ -322,6 +342,8 @@ class _LoginScreenState extends State<LoginScreen>
                         ),
                       ),
                     )
+                        .animate(onPlay: (c) => c.repeat(reverse: true))
+                        .moveY(begin: 0, end: -6, duration: 2.seconds, curve: Curves.easeInOut)
                         .animate()
                         .fadeIn(delay: 200.ms, duration: 600.ms)
                         .scale(begin: const Offset(0.8, 0.8)),
@@ -329,13 +351,18 @@ class _LoginScreenState extends State<LoginScreen>
                     const SizedBox(height: 24),
 
                     // ── Titles ──
-                    Text(
-                      'ParamaFlood',
-                      style: GoogleFonts.outfit(
-                        color: AppTheme.text,
-                        fontSize: 32,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: -0.8,
+                    ShaderMask(
+                      shaderCallback: (bounds) => const LinearGradient(
+                        colors: [AppTheme.colDist, AppTheme.heroAcc],
+                      ).createShader(bounds),
+                      child: Text(
+                        'ParamaFlood',
+                        style: GoogleFonts.outfit(
+                          color: Colors.white,
+                          fontSize: 34,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: -0.8,
+                        ),
                       ),
                     ).animate().fadeIn(delay: 300.ms),
 
@@ -352,7 +379,21 @@ class _LoginScreenState extends State<LoginScreen>
                       ),
                     ).animate().fadeIn(delay: 400.ms),
 
-                    const SizedBox(height: 36),
+                    const SizedBox(height: 18),
+
+                    // ── Feature highlights ──
+                    const Wrap(
+                      alignment: WrapAlignment.center,
+                      spacing: 6,
+                      runSpacing: 8,
+                      children: [
+                        _FeatureChip(icon: Icons.sensors_rounded, label: 'Sensor IoT', color: AppTheme.colDist),
+                        _FeatureChip(icon: Icons.auto_awesome_rounded, label: 'Analisis AI', color: AppTheme.colPres),
+                        _FeatureChip(icon: Icons.notifications_active_rounded, label: 'Peringatan Dini', color: AppTheme.warning),
+                      ],
+                    ).animate().fadeIn(delay: 450.ms).slideY(begin: 0.1),
+
+                    const SizedBox(height: 28),
 
                     // ── Domain Restriction Notice Card ──
                     Container(
@@ -549,6 +590,48 @@ class _LoginScreenState extends State<LoginScreen>
                   ],
                 ),
               ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FeatureChip extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+
+  const _FeatureChip({required this.icon, required this.label, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+      decoration: BoxDecoration(
+        color: AppTheme.cardSolid,
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: color.withValues(alpha: 0.25)),
+        boxShadow: [
+          BoxShadow(
+            color: color.withValues(alpha: 0.08),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: color, size: 14),
+          const SizedBox(width: 5),
+          Text(
+            label,
+            style: GoogleFonts.outfit(
+              color: AppTheme.text,
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
             ),
           ),
         ],

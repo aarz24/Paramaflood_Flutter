@@ -146,7 +146,14 @@ class DashboardScreen extends StatelessWidget {
                       ),
                       const SliverToBoxAdapter(child: SizedBox(height: 16)),
                       
-                      // 🧠 Panel Analisis AI Gemini
+                      const SliverToBoxAdapter(
+                        child: _SectionLabel(
+                          title: 'Analisis AI',
+                          subtitle: 'Ringkasan cerdas kondisi cuaca & banjir oleh Gemini',
+                          icon: Icons.psychology_rounded,
+                        ),
+                      ),
+                      const SliverToBoxAdapter(child: SizedBox(height: 12)),
                       SliverToBoxAdapter(
                         child: RepaintBoundary(
                           child: const AiInsightPanel()
@@ -157,7 +164,14 @@ class DashboardScreen extends StatelessWidget {
                       ),
                       const SliverToBoxAdapter(child: SizedBox(height: 18)),
 
-                      // 🌊 Simulator Penampang Kanal Air (2D Wave Physics)
+                      const SliverToBoxAdapter(
+                        child: _SectionLabel(
+                          title: 'Penampang Kanal',
+                          subtitle: 'Visualisasi ketinggian air, hujan, dan angin secara langsung',
+                          icon: Icons.water_rounded,
+                        ),
+                      ),
+                      const SliverToBoxAdapter(child: SizedBox(height: 12)),
                       SliverToBoxAdapter(
                         child: RepaintBoundary(
                           child: Consumer<AppState>(
@@ -178,22 +192,59 @@ class DashboardScreen extends StatelessWidget {
                       if (!data.hasReceivedLiveData)
                         SliverToBoxAdapter(
                           child: Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 12),
-                            padding: const EdgeInsets.all(16),
+                            margin: const EdgeInsets.symmetric(horizontal: 16),
+                            padding: const EdgeInsets.all(14),
                             decoration: BoxDecoration(
-                              color: AppTheme.heroAcc.withValues(alpha: 0.08),
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: AppTheme.heroAcc.withValues(alpha: 0.25)),
+                              color: AppTheme.cardSolid,
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: (data.error.isNotEmpty
+                                        ? AppTheme.offline
+                                        : AppTheme.heroAcc)
+                                    .withValues(alpha: 0.25),
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: (data.error.isNotEmpty
+                                          ? AppTheme.offline
+                                          : AppTheme.heroAcc)
+                                      .withValues(alpha: 0.08),
+                                  blurRadius: 16,
+                                  offset: const Offset(0, 6),
+                                ),
+                              ],
                             ),
                             child: Row(
                               children: [
-                                const SizedBox(
-                                  width: 18, height: 18,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: AppTheme.heroAcc,
+                                Container(
+                                  width: 42,
+                                  height: 42,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: (data.error.isNotEmpty
+                                            ? AppTheme.offline
+                                            : AppTheme.heroAcc)
+                                        .withValues(alpha: 0.12),
                                   ),
-                                ),
+                                  child: Icon(
+                                    data.error.isNotEmpty
+                                        ? Icons.wifi_off_rounded
+                                        : Icons.sensors_rounded,
+                                    size: 22,
+                                    color: data.error.isNotEmpty
+                                        ? AppTheme.offline
+                                        : AppTheme.heroAcc,
+                                  ),
+                                )
+                                    .animate(
+                                        onPlay: (c) =>
+                                            c.repeat(reverse: true))
+                                    .scale(
+                                      begin: const Offset(1, 1),
+                                      end: const Offset(1.1, 1.1),
+                                      duration: 1200.ms,
+                                      curve: Curves.easeInOut,
+                                    ),
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Column(
@@ -232,14 +283,15 @@ class DashboardScreen extends StatelessWidget {
                       // Section Header: Telemetri Sensor
                       const SliverToBoxAdapter(
                         child: _SectionLabel(
-                          title: 'TELEMETRI SENSOR REALTIME',
+                          title: 'Telemetri Sensor',
                           subtitle: 'Data pengukuran langsung stasiun cuaca & banjir ESP32',
+                          icon: Icons.sensors_rounded,
                         ),
                       ),
                       const SliverToBoxAdapter(child: SizedBox(height: 12)),
 
                       SliverPadding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
                         sliver: SliverGrid(
                           delegate: SliverChildListDelegate([
                             RepaintBoundary(
@@ -340,8 +392,8 @@ class DashboardScreen extends StatelessWidget {
                           ]),
                           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 2,
-                            crossAxisSpacing: 10,
-                            mainAxisSpacing: 10,
+                            crossAxisSpacing: 12,
+                            mainAxisSpacing: 12,
                             childAspectRatio: 0.9,
                           ),
                         ),
@@ -350,15 +402,16 @@ class DashboardScreen extends StatelessWidget {
                       if (kDebugMode) ...[
                         const SliverToBoxAdapter(
                           child: _SectionLabel(
-                            title: 'SIMULASI DATA SENSOR (DEBUG)',
+                            title: 'Simulasi Data (Debug)',
                             subtitle: 'Uji respon aplikasi terhadap skenario cuaca ekstrem tanpa hardware',
+                            icon: Icons.science_rounded,
                           ),
                         ),
                         const SliverToBoxAdapter(child: SizedBox(height: 10)),
                         const SliverToBoxAdapter(child: _TestPanel()),
                         const SliverToBoxAdapter(child: SizedBox(height: 20)),
                       ],
-                      const SliverToBoxAdapter(child: SizedBox(height: 20)),
+                      const SliverToBoxAdapter(child: SizedBox(height: 110)),
                     ],
                   ),
                 );
@@ -453,62 +506,134 @@ class _SectionIntro extends StatelessWidget {
     required this.locationLoading,
   });
 
+  static (Color, IconData, String, String) _riskStyle(String level) {
+    switch (level) {
+      case 'RENDAH':
+        return (AppTheme.online, Icons.verified_user_rounded, 'Aman', 'Risiko banjir rendah. Kondisi terpantau normal.');
+      case 'SEDANG':
+        return (AppTheme.warning, Icons.info_rounded, 'Waspada', 'Risiko sedang. Pantau ketinggian air secara berkala.');
+      case 'TINGGI':
+        return (const Color(0xFFEA580C), Icons.warning_amber_rounded, 'Siaga', 'Risiko tinggi. Siapkan langkah antisipasi banjir.');
+      case 'KRITIS':
+        return (AppTheme.offline, Icons.crisis_alert_rounded, 'Bahaya', 'Kondisi kritis! Segera lakukan evakuasi bila perlu.');
+      default:
+        return (AppTheme.heroAcc, Icons.radar_rounded, 'Menganalisis', 'Menunggu data cukup untuk menilai risiko banjir.');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final riskLevel = context.select<AppState, String>((s) => s.floodRiskLevel);
+    final (riskColor, riskIcon, riskTitle, riskDesc) = _riskStyle(riskLevel);
     final statusText = locationLoading ? 'Mencari Lokasi...' : locationName;
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          gradient: LinearGradient(
-            colors: [
-              AppTheme.cardSolid.withValues(alpha: 0.95),
-              AppTheme.bgAlt.withValues(alpha: 0.90),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          border: Border.all(color: AppTheme.cardBorder),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Sistem Pengawasan Banjir & Cuaca Terpadu',
-              style: GoogleFonts.outfit(
-                color: AppTheme.text,
-                fontSize: 15,
-                fontWeight: FontWeight.w700,
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(24),
+              gradient: LinearGradient(
+                colors: [riskColor, Color.lerp(riskColor, AppTheme.colDist, 0.45)!],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'Integrasi sensor ESP32, data OpenWeather, dan analisis kecerdasan AI dalam satu tampilan.',
-              style: GoogleFonts.outfit(
-                color: AppTheme.subtext,
-                fontSize: 11,
-                height: 1.35,
-              ),
-            ),
-            const SizedBox(height: 10),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                _pill(Icons.location_on_rounded, statusText, AppTheme.heroAcc),
-                _pill(Icons.sensors_rounded,
-                    online ? 'ESP32 Terhubung' : 'ESP32 Terputus',
-                    online ? AppTheme.online : AppTheme.offline),
-                _pill(Icons.cloud_sync_rounded,
-                    internet != null ? 'OpenWeather Aktif' : 'Sinkronisasi OpenWeather...',
-                    AppTheme.heroAcc),
+              boxShadow: [
+                BoxShadow(
+                  color: riskColor.withValues(alpha: 0.28),
+                  blurRadius: 24,
+                  offset: const Offset(0, 10),
+                ),
               ],
             ),
-            const SizedBox(height: 10),
-            GestureDetector(
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Positioned(
+                  right: -18,
+                  top: -18,
+                  child: Icon(
+                    Icons.water_rounded,
+                    size: 110,
+                    color: Colors.white.withValues(alpha: 0.10),
+                  ),
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.2),
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: Icon(riskIcon, color: Colors.white, size: 22),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'STATUS RISIKO BANJIR',
+                                style: GoogleFonts.outfit(
+                                  color: Colors.white.withValues(alpha: 0.85),
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 1.4,
+                                ),
+                              ),
+                              Text(
+                                riskTitle,
+                                style: GoogleFonts.outfit(
+                                  color: Colors.white,
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.w800,
+                                  height: 1.1,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      riskDesc,
+                      style: GoogleFonts.outfit(
+                        color: Colors.white.withValues(alpha: 0.92),
+                        fontSize: 12,
+                        height: 1.35,
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        _pill(Icons.location_on_rounded, statusText),
+                        _pill(Icons.sensors_rounded, online ? 'ESP32 Terhubung' : 'ESP32 Terputus',
+                            dot: online ? const Color(0xFF4ADE80) : const Color(0xFFFCA5A5)),
+                        _pill(Icons.cloud_sync_rounded,
+                            internet != null ? 'OpenWeather Aktif' : 'Sinkronisasi...'),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ).animate().fadeIn(duration: 350.ms).slideY(begin: 0.06),
+          const SizedBox(height: 12),
+          Material(
+            color: AppTheme.cardSolid,
+            borderRadius: BorderRadius.circular(18),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(18),
               onTap: () {
                 showModalBottomSheet(
                   context: context,
@@ -517,56 +642,92 @@ class _SectionIntro extends StatelessWidget {
                   builder: (ctx) => const AiChatPanel(),
                 );
               },
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              child: Ink(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                 decoration: BoxDecoration(
-                  color: AppTheme.heroAcc.withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppTheme.heroAcc.withValues(alpha: 0.25)),
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(color: AppTheme.cardBorder),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.auto_awesome_rounded, color: AppTheme.heroAcc, size: 15),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        'Tanya ParaBot AI: "Apakah hari ini aman dari banjir?"',
-                        style: GoogleFonts.outfit(
-                          color: AppTheme.heroAcc,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
+                    Container(
+                      width: 38,
+                      height: 38,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        gradient: const LinearGradient(
+                          colors: [AppTheme.heroAcc, AppTheme.colPres],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
-                        overflow: TextOverflow.ellipsis,
+                      ),
+                      child: const Icon(Icons.auto_awesome_rounded, color: Colors.white, size: 18),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Tanya ParaBot AI',
+                            style: GoogleFonts.outfit(
+                              color: AppTheme.text,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          Text(
+                            '"Apakah hari ini aman dari banjir?"',
+                            style: GoogleFonts.outfit(color: AppTheme.subtext, fontSize: 11),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
                       ),
                     ),
-                    const Icon(Icons.arrow_forward_ios_rounded, color: AppTheme.heroAcc, size: 11),
+                    Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: AppTheme.heroAcc.withValues(alpha: 0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.arrow_forward_rounded, color: AppTheme.heroAcc, size: 16),
+                    ),
                   ],
                 ),
               ),
             ),
-          ],
-        ),
+          ).animate().fadeIn(delay: 80.ms, duration: 350.ms),
+        ],
       ),
     );
   }
 
-  Widget _pill(IconData icon, String label, Color color) {
+  Widget _pill(IconData icon, String label, {Color? dot}) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
+        color: Colors.white.withValues(alpha: 0.18),
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: color.withValues(alpha: 0.25)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.28)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: color, size: 13),
-          const SizedBox(width: 5),
+          if (dot != null) ...[
+            Container(
+              width: 7,
+              height: 7,
+              decoration: BoxDecoration(color: dot, shape: BoxShape.circle),
+            ),
+            const SizedBox(width: 6),
+          ] else ...[
+            Icon(icon, color: Colors.white, size: 13),
+            const SizedBox(width: 5),
+          ],
           Text(
             label,
             style: GoogleFonts.outfit(
-              color: color,
+              color: Colors.white,
               fontSize: 11,
               fontWeight: FontWeight.w600,
             ),
@@ -580,32 +741,51 @@ class _SectionIntro extends StatelessWidget {
 class _SectionLabel extends StatelessWidget {
   final String title;
   final String subtitle;
+  final IconData icon;
 
-  const _SectionLabel({required this.title, required this.subtitle});
+  const _SectionLabel({
+    required this.title,
+    required this.subtitle,
+    this.icon = Icons.insights_rounded,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          Text(
-            title,
-            style: GoogleFonts.outfit(
-              color: AppTheme.heroAcc,
-              fontSize: 12,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 1.5,
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: AppTheme.heroAcc.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(12),
             ),
+            child: Icon(icon, color: AppTheme.heroAcc, size: 18),
           ),
-          const SizedBox(height: 2),
-          Text(
-            subtitle,
-            style: GoogleFonts.outfit(
-              color: AppTheme.subtext,
-              fontSize: 11,
-              height: 1.25,
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: GoogleFonts.outfit(
+                    color: AppTheme.text,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 1),
+                Text(
+                  subtitle,
+                  style: GoogleFonts.outfit(
+                    color: AppTheme.subtext,
+                    fontSize: 11,
+                    height: 1.25,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -625,30 +805,44 @@ class _AppBar extends StatelessWidget {
     required this.online,
   });
 
+  static const _days = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
+  static const _months = [
+    'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des',
+  ];
+
+  String _greeting(int hour) {
+    if (hour < 11) return 'Selamat Pagi';
+    if (hour < 15) return 'Selamat Siang';
+    if (hour < 18) return 'Selamat Sore';
+    return 'Selamat Malam';
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.fromLTRB(12, 8, 12, 0),
-      padding: const EdgeInsets.fromLTRB(16, 12, 12, 12),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [
-            AppTheme.cardSolid,
-            AppTheme.bgAlt,
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppTheme.cardBorder),
-      ),
+    final now = DateTime.now();
+    final dateText = '${_days[now.weekday - 1]}, ${now.day} ${_months[now.month - 1]} ${now.year}';
+    final statusColor = online ? AppTheme.online : AppTheme.offline;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 12, 0),
       child: Row(
         children: [
-          SizedBox(
-            width: 44,
-            height: 44,
+          Container(
+            width: 46,
+            height: 46,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: AppTheme.cardBorder),
+              boxShadow: [
+                BoxShadow(
+                  color: AppTheme.heroAcc.withValues(alpha: 0.12),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(13),
               child: Image.asset(
                 'assets/images/splashscreen.jpg',
                 fit: BoxFit.cover,
@@ -657,11 +851,7 @@ class _AppBar extends StatelessWidget {
                     'assets/images/splashscreen.png',
                     fit: BoxFit.cover,
                     errorBuilder: (ctx, err, st) {
-                      return const Icon(
-                        Icons.domain_rounded,
-                        color: AppTheme.heroAcc,
-                        size: 22,
-                      );
+                      return const Icon(Icons.domain_rounded, color: AppTheme.heroAcc, size: 22);
                     },
                   );
                 },
@@ -674,51 +864,59 @@ class _AppBar extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'PARAMAFLOOD',
+                  '${_greeting(now.hour)} 👋',
                   style: GoogleFonts.outfit(
                     color: AppTheme.text,
-                    fontSize: 17,
+                    fontSize: 19,
                     fontWeight: FontWeight.w800,
-                    letterSpacing: 0.8,
                   ),
                 ),
-                const SizedBox(height: 1),
                 Text(
-                  'Flood & Weather Monitoring · $locationName',
-                  style: GoogleFonts.outfit(
-                    color: AppTheme.subtext,
-                    fontSize: 11,
-                    letterSpacing: 0.2,
-                  ),
+                  '$dateText · ParamaFlood',
+                  style: GoogleFonts.outfit(color: AppTheme.subtext, fontSize: 11),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
           ),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
-              color: (online ? AppTheme.online : AppTheme.offline).withValues(alpha: 0.14),
+              color: statusColor.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(999),
-              border: Border.all(
-                color: (online ? AppTheme.online : AppTheme.offline).withValues(alpha: 0.35),
-              ),
             ),
-            child: Text(
-              online ? 'LIVE' : 'OFFLINE',
-              style: GoogleFonts.outfit(
-                color: online ? AppTheme.online : AppTheme.offline,
-                fontSize: 10,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 1.0,
-              ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 7,
+                  height: 7,
+                  decoration: BoxDecoration(color: statusColor, shape: BoxShape.circle),
+                )
+                    .animate(onPlay: (c) => c.repeat(reverse: true))
+                    .fade(begin: 0.35, end: 1, duration: 900.ms),
+                const SizedBox(width: 6),
+                Text(
+                  online ? 'LIVE' : 'OFFLINE',
+                  style: GoogleFonts.outfit(
+                    color: statusColor,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1.0,
+                  ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(width: 8),
-          IconButton(
-            icon: const Icon(Icons.refresh_rounded, color: AppTheme.heroAcc, size: 22),
-            onPressed: onRefresh,
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(),
+          const SizedBox(width: 6),
+          Material(
+            color: AppTheme.cardSolid,
+            shape: const CircleBorder(side: BorderSide(color: AppTheme.cardBorder)),
+            child: IconButton(
+              icon: const Icon(Icons.refresh_rounded, color: AppTheme.heroAcc, size: 20),
+              tooltip: 'Muat ulang',
+              onPressed: onRefresh,
+            ),
           ),
         ],
       ),
@@ -761,7 +959,7 @@ class _TestPanelState extends State<_TestPanel> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 12),
+      margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
         color: AppTheme.cardSolid,
         borderRadius: BorderRadius.circular(20),
@@ -855,6 +1053,10 @@ class _TestPanelState extends State<_TestPanel> {
                 ),
               ),
               backgroundColor: AppTheme.heroAcc,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
               duration: const Duration(seconds: 2),
             ),
           );

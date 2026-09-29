@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../models/weather_data.dart';
 import '../services/app_theme.dart';
@@ -16,10 +17,10 @@ class ComparisonPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 12),
+      margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppTheme.card,
+        color: AppTheme.cardSolid,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: AppTheme.cardBorder),
         boxShadow: [
@@ -46,38 +47,48 @@ class ComparisonPanel extends StatelessWidget {
             const Spacer(),
             if (internet != null)
               Text('Open-Meteo · ${_ago(internet!.fetchedAt)}',
-                  style: GoogleFonts.outfit(
-                      color: AppTheme.subtext, fontSize: 9)),
+                  style:
+                      GoogleFonts.outfit(color: AppTheme.subtext, fontSize: 9)),
           ],
         ),
         const SizedBox(height: 14),
         if (internet == null)
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              child: Text('Waiting for internet weather...',
-                  style: GoogleFonts.outfit(
-                      color: AppTheme.subtext, fontSize: 10)),
-            ),
+          const _EmptyState(
+            icon: Icons.cloud_sync_rounded,
+            color: AppTheme.heroAcc,
+            title: 'Menunggu data cuaca internet',
+            subtitle: 'Mengambil data pembanding dari Open-Meteo...',
           )
         else ...[
-          _compareRow('TEMP', sensor.temp,
+          _compareRow(
+              'TEMP',
+              sensor.temp,
               '${sensor.temp.toStringAsFixed(1)}°C',
               internet!.temp,
               '${internet!.temp.toStringAsFixed(1)}°C',
-              AppTheme.colTemp, -10, 50),
+              AppTheme.colTemp,
+              -10,
+              50),
           const SizedBox(height: 8),
-          _compareRow('HUMIDITY', sensor.hum,
+          _compareRow(
+              'HUMIDITY',
+              sensor.hum,
               '${sensor.hum.toStringAsFixed(0)}%',
               internet!.hum,
               '${internet!.hum.toStringAsFixed(0)}%',
-              AppTheme.colHum, 0, 100),
+              AppTheme.colHum,
+              0,
+              100),
           const SizedBox(height: 8),
-          _compareRow('WIND', sensor.wind,
+          _compareRow(
+              'WIND',
+              sensor.wind,
               '${sensor.wind.toStringAsFixed(1)} m/s',
               internet!.windSpeed,
               '${internet!.windSpeed.toStringAsFixed(1)} m/s',
-              AppTheme.colWind, 0, 20),
+              AppTheme.colWind,
+              0,
+              20),
           const SizedBox(height: 12),
           _analysisSummary(),
         ],
@@ -87,17 +98,19 @@ class ComparisonPanel extends StatelessWidget {
 
   Widget _compareRow(
     String label,
-    double sVal, String sStr,
-    double iVal, String iStr,
+    double sVal,
+    String sStr,
+    double iVal,
+    String iStr,
     Color color,
-    double min, double max,
+    double min,
+    double max,
   ) {
     final sPct = ((sVal - min) / (max - min)).clamp(0.0, 1.0);
     final iPct = ((iVal - min) / (max - min)).clamp(0.0, 1.0);
     final diff = sVal - iVal;
-    final diffStr = diff >= 0
-        ? '+${diff.toStringAsFixed(1)}'
-        : diff.toStringAsFixed(1);
+    final diffStr =
+        diff >= 0 ? '+${diff.toStringAsFixed(1)}' : diff.toStringAsFixed(1);
     final diffColor = diff.abs() > 3 ? AppTheme.offline : AppTheme.online;
 
     return Row(children: [
@@ -106,7 +119,8 @@ class ComparisonPanel extends StatelessWidget {
         child: Text(label,
             style: GoogleFonts.outfit(
                 color: color.withValues(alpha: 0.8),
-                fontSize: 8, letterSpacing: 1)),
+                fontSize: 8,
+                letterSpacing: 1)),
       ),
       Expanded(
         child: Column(children: [
@@ -124,8 +138,7 @@ class ComparisonPanel extends StatelessWidget {
           border: Border.all(color: diffColor.withValues(alpha: 0.5)),
         ),
         child: Text(diffStr,
-            style: GoogleFonts.outfit(
-                color: diffColor, fontSize: 8)),
+            style: GoogleFonts.outfit(color: diffColor, fontSize: 8)),
       ),
     ]);
   }
@@ -135,8 +148,7 @@ class ComparisonPanel extends StatelessWidget {
       Container(
           width: 8,
           height: 8,
-          decoration:
-              BoxDecoration(color: dotColor, shape: BoxShape.circle)),
+          decoration: BoxDecoration(color: dotColor, shape: BoxShape.circle)),
       const SizedBox(width: 4),
       Expanded(
         child: Stack(children: [
@@ -150,8 +162,7 @@ class ComparisonPanel extends StatelessWidget {
             child: Container(
                 height: 6,
                 decoration: BoxDecoration(
-                    color: barColor,
-                    borderRadius: BorderRadius.circular(3))),
+                    color: barColor, borderRadius: BorderRadius.circular(3))),
           ),
         ]),
       ),
@@ -159,8 +170,7 @@ class ComparisonPanel extends StatelessWidget {
       SizedBox(
         width: 55,
         child: Text(label,
-            style:
-                GoogleFonts.outfit(color: barColor, fontSize: 9),
+            style: GoogleFonts.outfit(color: barColor, fontSize: 9),
             textAlign: TextAlign.right),
       ),
     ]);
@@ -197,14 +207,12 @@ class ComparisonPanel extends StatelessWidget {
           const SizedBox(width: 4),
           Text('ANALYSIS',
               style: GoogleFonts.outfit(
-                  color: AppTheme.heroAcc,
-                  fontSize: 9, letterSpacing: 1.5)),
+                  color: AppTheme.heroAcc, fontSize: 9, letterSpacing: 1.5)),
         ]),
         const SizedBox(height: 6),
         if (issues.isEmpty)
           Text('✅ All readings consistent with internet data',
-              style: GoogleFonts.outfit(
-                  color: AppTheme.online, fontSize: 9))
+              style: GoogleFonts.outfit(color: AppTheme.online, fontSize: 9))
         else
           ...issues.map((i) => Padding(
                 padding: const EdgeInsets.only(bottom: 4),
@@ -225,8 +233,7 @@ class ComparisonPanel extends StatelessWidget {
                   color: AppTheme.heroAcc, shape: BoxShape.circle)),
           const SizedBox(width: 4),
           Text('Sensor  ',
-              style: GoogleFonts.outfit(
-                  color: AppTheme.heroAcc, fontSize: 8)),
+              style: GoogleFonts.outfit(color: AppTheme.heroAcc, fontSize: 8)),
           Container(
               width: 7,
               height: 7,
@@ -234,8 +241,7 @@ class ComparisonPanel extends StatelessWidget {
                   color: AppTheme.internet, shape: BoxShape.circle)),
           const SizedBox(width: 4),
           Text('Internet',
-              style: GoogleFonts.outfit(
-                  color: AppTheme.internet, fontSize: 8)),
+              style: GoogleFonts.outfit(color: AppTheme.internet, fontSize: 8)),
         ]),
       ]),
     );
@@ -266,13 +272,13 @@ class _HistoryChartState extends State<HistoryChart>
 
   // (label, color, unit, icon)
   static const _cfg = [
-    ('KETINGGIAN AIR', AppTheme.colDist,  'cm',  Icons.waves_rounded),
-    ('HUJAN',          AppTheme.colRain,  'mm',  Icons.grain_rounded),
-    ('SUHU',           AppTheme.colTemp,  '°C',  Icons.thermostat_rounded),
-    ('KELEMBABAN',     AppTheme.colHum,   '%',   Icons.water_drop_rounded),
-    ('ANGIN',          AppTheme.colWind,  'm/s', Icons.air_rounded),
-    ('CAHAYA',         AppTheme.colLight, 'lx',  Icons.wb_sunny_rounded),
-    ('BATERAI',        AppTheme.colBatt,  'V',   Icons.battery_charging_full_rounded),
+    ('KETINGGIAN AIR', AppTheme.colDist, 'cm', Icons.waves_rounded),
+    ('HUJAN', AppTheme.colRain, 'mm', Icons.grain_rounded),
+    ('SUHU', AppTheme.colTemp, '°C', Icons.thermostat_rounded),
+    ('KELEMBABAN', AppTheme.colHum, '%', Icons.water_drop_rounded),
+    ('ANGIN', AppTheme.colWind, 'm/s', Icons.air_rounded),
+    ('CAHAYA', AppTheme.colLight, 'lx', Icons.wb_sunny_rounded),
+    ('BATERAI', AppTheme.colBatt, 'V', Icons.battery_charging_full_rounded),
   ];
 
   List<double> get _vals {
@@ -291,17 +297,21 @@ class _HistoryChartState extends State<HistoryChart>
   @override
   Widget build(BuildContext context) {
     final color = _cfg[_tab].$2;
-    final unit  = _cfg[_tab].$3;
-    final vals  = _vals;
+    final unit = _cfg[_tab].$3;
+    final vals = _vals;
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 12),
+      margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
         color: AppTheme.cardSolid,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(color: AppTheme.cardBorder),
         boxShadow: [
-          BoxShadow(color: color.withValues(alpha: 0.06), blurRadius: 20, spreadRadius: 2),
+          BoxShadow(
+            color: color.withValues(alpha: 0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
         ],
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -309,39 +319,33 @@ class _HistoryChartState extends State<HistoryChart>
         Padding(
           padding: const EdgeInsets.fromLTRB(14, 14, 14, 0),
           child: Row(children: [
-            Text('HISTORY',
+            Text('RIWAYAT',
                 style: GoogleFonts.outfit(
                     color: AppTheme.heroAcc,
                     fontSize: 10,
                     letterSpacing: 2.5,
                     fontWeight: FontWeight.w700)),
             const SizedBox(width: 8),
-            Text('LAST ${vals.length} READINGS',
-                style: GoogleFonts.outfit(
-                    color: AppTheme.subtext, fontSize: 9)),
+            Text('${vals.length} pembacaan terakhir',
+                style:
+                    GoogleFonts.outfit(color: AppTheme.subtext, fontSize: 9)),
           ]),
         ),
 
         const SizedBox(height: 10),
 
-        // ── Sensor tab boxes in a 2-column grid ──────────────────
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          child: GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 8,
-              mainAxisSpacing: 8,
-              childAspectRatio: 2.8,
-            ),
+        // ── Sensor selector chips ───────────────────────────────
+        SizedBox(
+          height: 52,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 14),
             itemCount: _cfg.length,
+            separatorBuilder: (_, __) => const SizedBox(width: 8),
             itemBuilder: (ctx, i) {
               final isActive = _tab == i;
               final cfg = _cfg[i];
               final tabColor = cfg.$2;
-              // Compute current value for this tab
               double? cur;
               if (widget.history.isNotEmpty) {
                 cur = switch (i) {
@@ -356,91 +360,72 @@ class _HistoryChartState extends State<HistoryChart>
                 };
               }
 
-              return GestureDetector(
-                onTap: () => setState(() => _tab = i),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 220),
-                  curve: Curves.easeOut,
-                  decoration: BoxDecoration(
-                    color: isActive
-                        ? tabColor.withValues(alpha: 0.10)
-                        : AppTheme.bgAlt,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
+              return Semantics(
+                button: true,
+                selected: isActive,
+                child: GestureDetector(
+                  onTap: () => setState(() => _tab = i),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 220),
+                    curve: Curves.easeOut,
+                    padding: const EdgeInsets.fromLTRB(6, 6, 14, 6),
+                    decoration: BoxDecoration(
                       color: isActive
-                          ? tabColor
-                          : AppTheme.cardBorder,
-                      width: isActive ? 1.5 : 1.0,
-                    ),
-                    boxShadow: isActive
-                        ? [
-                            BoxShadow(
-                                color: tabColor.withValues(alpha: 0.15),
+                          ? Color.alphaBlend(tabColor.withValues(alpha: 0.10),
+                              AppTheme.cardSolid)
+                          : AppTheme.cardSolid,
+                      borderRadius: BorderRadius.circular(999),
+                      border: Border.all(
+                        color: isActive ? tabColor : AppTheme.cardBorder,
+                        width: isActive ? 1.5 : 1.0,
+                      ),
+                      boxShadow: isActive
+                          ? [
+                              BoxShadow(
+                                color: tabColor.withValues(alpha: 0.18),
                                 blurRadius: 12,
-                                spreadRadius: 1)
-                          ]
-                        : [],
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 8),
-                    child: Row(children: [
-                      // Sensor icon
-                      Container(
-                        padding: const EdgeInsets.all(5),
+                                offset: const Offset(0, 4),
+                              )
+                            ]
+                          : [],
+                    ),
+                    child: Row(mainAxisSize: MainAxisSize.min, children: [
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 220),
+                        width: 32,
+                        height: 32,
                         decoration: BoxDecoration(
-                          color: tabColor.withValues(alpha: isActive ? 0.15 : 0.08),
-                          borderRadius: BorderRadius.circular(8),
+                          shape: BoxShape.circle,
+                          color: isActive
+                              ? tabColor
+                              : tabColor.withValues(alpha: 0.12),
                         ),
-                        child: Icon(
-                          cfg.$4,
-                          size: isActive ? 16 : 14,
-                          color: isActive ? tabColor : tabColor.withValues(alpha: 0.5),
-                        ),
+                        child: Icon(cfg.$4,
+                            size: 16,
+                            color: isActive ? Colors.white : tabColor),
                       ),
                       const SizedBox(width: 8),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(cfg.$1,
-                                style: GoogleFonts.outfit(
-                                    color: isActive
-                                        ? tabColor
-                                        : tabColor.withValues(alpha: 0.5),
-                                    fontSize: 9,
-                                    letterSpacing: 1.2,
-                                    fontWeight: isActive
-                                        ? FontWeight.w700
-                                        : FontWeight.normal)),
-                            if (cur != null)
-                              Text(
-                                '${cur.toStringAsFixed(1)} ${cfg.$3}',
-                                style: GoogleFonts.outfit(
-                                    color: isActive
-                                        ? tabColor
-                                        : tabColor.withValues(alpha: 0.4),
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                          ],
-                        ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(cfg.$1,
+                              style: GoogleFonts.outfit(
+                                  color: isActive ? tabColor : AppTheme.text,
+                                  fontSize: 10,
+                                  letterSpacing: 0.8,
+                                  fontWeight: FontWeight.w700)),
+                          Text(
+                            cur != null
+                                ? '${cur.toStringAsFixed(1)} ${cfg.$3}'
+                                : '—',
+                            style: GoogleFonts.outfit(
+                                color: AppTheme.subtext,
+                                fontSize: 10,
+                                fontWeight: FontWeight.w600),
+                          ),
+                        ],
                       ),
-                      // Active indicator bar
-                      if (isActive)
-                        Container(
-                          width: 3,
-                          height: 28,
-                          decoration: BoxDecoration(
-                              color: tabColor,
-                              borderRadius: BorderRadius.circular(2),
-                              boxShadow: [
-                                BoxShadow(
-                                    color: tabColor.withValues(alpha: 0.3),
-                                    blurRadius: 6)
-                              ]),
-                        ),
                     ]),
                   ),
                 ),
@@ -455,13 +440,11 @@ class _HistoryChartState extends State<HistoryChart>
         Padding(
           padding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
           child: vals.isEmpty
-              ? Center(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 20),
-                    child: Text('No history data yet',
-                        style: GoogleFonts.outfit(
-                            color: AppTheme.subtext, fontSize: 10)),
-                  ),
+              ? _EmptyState(
+                  icon: Icons.show_chart_rounded,
+                  color: color,
+                  title: 'Belum ada data riwayat',
+                  subtitle: 'Grafik akan muncul setelah sensor mengirim data.',
                 )
               : _buildChart(vals, color, unit),
         ),
@@ -470,7 +453,9 @@ class _HistoryChartState extends State<HistoryChart>
   }
 
   Widget _buildChart(List<double> vals, Color color, String unit) {
-    final spots = vals.asMap().entries
+    final spots = vals
+        .asMap()
+        .entries
         .map((e) => FlSpot(e.key.toDouble(), e.value))
         .toList();
     final minY = vals.reduce((a, b) => a < b ? a : b) * 0.97;
@@ -486,9 +471,7 @@ class _HistoryChartState extends State<HistoryChart>
             show: true,
             drawVerticalLine: false,
             getDrawingHorizontalLine: (_) => const FlLine(
-                color: AppTheme.divider,
-                strokeWidth: 1,
-                dashArray: [4, 4]),
+                color: AppTheme.divider, strokeWidth: 1, dashArray: [4, 4]),
           ),
           borderData: FlBorderData(show: false),
           titlesData: FlTitlesData(
@@ -513,9 +496,8 @@ class _HistoryChartState extends State<HistoryChart>
                     return const SizedBox();
                   }
                   final t = widget.history[i].timestamp;
-                  final h = t.hour > 12
-                      ? t.hour - 12
-                      : (t.hour == 0 ? 12 : t.hour);
+                  final h =
+                      t.hour > 12 ? t.hour - 12 : (t.hour == 0 ? 12 : t.hour);
                   final ap = t.hour >= 12 ? 'P' : 'A';
                   return Text(
                     '${h.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}$ap',
@@ -525,17 +507,20 @@ class _HistoryChartState extends State<HistoryChart>
                 },
               ),
             ),
-            topTitles: const AxisTitles(
-                sideTitles: SideTitles(showTitles: false)),
-            rightTitles: const AxisTitles(
-                sideTitles: SideTitles(showTitles: false)),
+            topTitles:
+                const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            rightTitles:
+                const AxisTitles(sideTitles: SideTitles(showTitles: false)),
           ),
           lineBarsData: [
             LineChartBarData(
               spots: spots,
               isCurved: true,
-              color: color,
-              barWidth: 2.5,
+              gradient: LinearGradient(
+                colors: [color.withValues(alpha: 0.6), color],
+              ),
+              barWidth: 3,
+              isStrokeCapRound: true,
               dotData: FlDotData(
                 show: true,
                 getDotPainter: (_, __, ___, ____) => FlDotCirclePainter(
@@ -592,16 +577,8 @@ class WeatherAnalyticsPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 12),
+      margin: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 2, bottom: 8),
-          child: Text('WEATHER ANALYTICS',
-              style: GoogleFonts.outfit(
-                  color: AppTheme.heroAcc,
-                  fontSize: 10,
-                  letterSpacing: 2.5)),
-        ),
         GridView.count(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
@@ -610,33 +587,57 @@ class WeatherAnalyticsPanel extends StatelessWidget {
           mainAxisSpacing: 10,
           childAspectRatio: 1.5,
           children: [
-            _card('HEAT INDEX',
+            _card(
+                Icons.thermostat_rounded,
+                'HEAT INDEX',
                 '${sensor.feelsLike.toStringAsFixed(1)}°C',
-                'Suhu terasa', AppTheme.colTemp),
-            _card('KEKUATAN ANGIN', _beaufort(sensor.wind),
+                'Suhu terasa',
+                AppTheme.colTemp),
+            _card(
+                Icons.air_rounded,
+                'KEKUATAN ANGIN',
+                _beaufort(sensor.wind),
                 '${sensor.wind.toStringAsFixed(1)} m/s  (${(sensor.wind * 3.6).toStringAsFixed(1)} km/h)',
                 AppTheme.colWind),
-            _card('KONDISI CUACA', sensor.condition,
+            _card(
+                Icons.cloud_rounded,
+                'KONDISI CUACA',
+                sensor.condition,
                 internet != null
                     ? 'Internet: ${internet!.conditionLabel}'
                     : 'Sensor: ${sensor.distanceLabel}',
                 AppTheme.colRain),
-            _card('KUALITAS UDARA', sensor.airQualityLabel,
+            _card(
+                Icons.eco_rounded,
+                'KUALITAS UDARA',
+                sensor.airQualityLabel,
                 'Kelembaban ${sensor.hum.toStringAsFixed(0)}%  Suhu ${sensor.temp.toStringAsFixed(1)}°C',
                 _aqColor(sensor.airQualityLabel)),
             if (history.length >= 3) ...[
-              _card('TREN SUHU',
+              _card(
+                  Icons.device_thermostat_rounded,
+                  'TREN SUHU',
                   _trend(history.map((e) => e.temp).toList()),
-                  '${history.length} pembacaan terakhir', AppTheme.colTemp),
-              _card('TREN HUJAN',
+                  '${history.length} pembacaan terakhir',
+                  AppTheme.colTemp),
+              _card(
+                  Icons.water_drop_rounded,
+                  'TREN HUJAN',
                   _trend(history.map((e) => e.rain).toList()),
-                  '${history.last.rain.toStringAsFixed(1)} mm', AppTheme.colRain),
-              _card('TREN AIR',
+                  '${history.last.rain.toStringAsFixed(1)} mm',
+                  AppTheme.colRain),
+              _card(
+                  Icons.waves_rounded,
+                  'TREN AIR',
                   _trend(history.map((e) => 400.0 - e.distance).toList()),
-                  history.last.distanceLabel, AppTheme.colDist),
-              _card('TREN BATERAI',
+                  history.last.distanceLabel,
+                  AppTheme.colDist),
+              _card(
+                  Icons.battery_charging_full_rounded,
+                  'TREN BATERAI',
                   _trend(history.map((e) => e.battery).toList()),
-                  history.last.batteryLabel, AppTheme.colBatt),
+                  history.last.batteryLabel,
+                  AppTheme.colBatt),
             ],
           ],
         ),
@@ -644,34 +645,68 @@ class WeatherAnalyticsPanel extends StatelessWidget {
     );
   }
 
-  Widget _card(String title, String value, String sub, Color color) =>
+  Widget _card(
+          IconData icon, String title, String value, String sub, Color color) =>
       Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: AppTheme.cardSolid,
-          borderRadius: BorderRadius.circular(12),
-          border: Border(left: BorderSide(color: color, width: 3)),
+          gradient: LinearGradient(
+            colors: [
+              Color.alphaBlend(
+                  color.withValues(alpha: 0.10), AppTheme.cardSolid),
+              AppTheme.cardSolid,
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: color.withValues(alpha: 0.22)),
           boxShadow: [
-            BoxShadow(color: color.withValues(alpha: 0.06), blurRadius: 10)
+            BoxShadow(
+              color: color.withValues(alpha: 0.08),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
           ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(title,
-                style: GoogleFonts.outfit(
-                    color: color.withValues(alpha: 0.7),
-                    fontSize: 7, letterSpacing: 1)),
+            Row(children: [
+              Container(
+                width: 24,
+                height: 24,
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.14),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(icon, size: 14, color: color),
+              ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.outfit(
+                        color: color,
+                        fontSize: 9,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.8)),
+              ),
+            ]),
             Text(value,
                 style: GoogleFonts.outfit(
-                    color: color,
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold),
+                    color: AppTheme.text,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -0.3),
+                maxLines: 1,
                 overflow: TextOverflow.ellipsis),
             Text(sub,
-                style: GoogleFonts.outfit(
-                    color: AppTheme.subtext, fontSize: 8),
+                style:
+                    GoogleFonts.outfit(color: AppTheme.subtext, fontSize: 10),
+                maxLines: 1,
                 overflow: TextOverflow.ellipsis),
           ],
         ),
@@ -700,5 +735,55 @@ class WeatherAnalyticsPanel extends StatelessWidget {
     if (label == 'GOOD') return AppTheme.online;
     if (label == 'MODERATE') return AppTheme.heroAcc;
     return AppTheme.offline;
+  }
+}
+
+class _EmptyState extends StatelessWidget {
+  final IconData icon;
+  final Color color;
+  final String title;
+  final String subtitle;
+
+  const _EmptyState({
+    required this.icon,
+    required this.color,
+    required this.title,
+    required this.subtitle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 20),
+      child: Center(
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          Container(
+            width: 52,
+            height: 52,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: color.withValues(alpha: 0.10),
+            ),
+            child: Icon(icon, color: color, size: 26),
+          ).animate(onPlay: (c) => c.repeat(reverse: true)).scale(
+                begin: const Offset(1, 1),
+                end: const Offset(1.08, 1.08),
+                duration: 1400.ms,
+                curve: Curves.easeInOut,
+              ),
+          const SizedBox(height: 12),
+          Text(title,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.outfit(
+                  color: AppTheme.text,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700)),
+          const SizedBox(height: 4),
+          Text(subtitle,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.outfit(color: AppTheme.subtext, fontSize: 11)),
+        ]),
+      ),
+    );
   }
 }

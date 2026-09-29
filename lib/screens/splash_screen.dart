@@ -202,13 +202,18 @@ class _SplashScreenState extends State<SplashScreen>
                 const SizedBox(height: 28),
 
                 // App title
-                Text(
-                  'PARAMAFLOOD',
-                  style: GoogleFonts.outfit(
-                    color: AppTheme.text,
-                    fontSize: 32,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 3,
+                ShaderMask(
+                  shaderCallback: (bounds) => const LinearGradient(
+                    colors: [AppTheme.text, AppTheme.colDist],
+                  ).createShader(bounds),
+                  child: Text(
+                    'PARAMAFLOOD',
+                    style: GoogleFonts.outfit(
+                      color: Colors.white,
+                      fontSize: 32,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 3,
+                    ),
                   ),
                 )
                     .animate()
@@ -240,15 +245,48 @@ class _SplashScreenState extends State<SplashScreen>
                 ).animate().fadeIn(delay: 800.ms, duration: 500.ms),
                 const SizedBox(height: 40),
 
-                // Loading indicator
+                // Loading progress
                 SizedBox(
-                  width: 28,
-                  height: 28,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2.5,
-                    color: AppTheme.heroAcc.withValues(alpha: 0.6),
+                  width: 160,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(99),
+                    child: TweenAnimationBuilder<double>(
+                      tween: Tween(begin: 0, end: 1),
+                      duration: const Duration(milliseconds: 2600),
+                      curve: Curves.easeInOutCubic,
+                      builder: (context, value, _) => Stack(
+                        children: [
+                          Container(
+                            height: 5,
+                            color: AppTheme.cardBorder,
+                          ),
+                          FractionallySizedBox(
+                            widthFactor: value,
+                            child: Container(
+                              height: 5,
+                              decoration: const BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [AppTheme.heroAcc, AppTheme.colDist],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                ).animate().fadeIn(delay: 1000.ms, duration: 400.ms),
+                ).animate().fadeIn(delay: 600.ms, duration: 400.ms),
+                const SizedBox(height: 10),
+                Text(
+                  'Menghubungkan sensor...',
+                  style: GoogleFonts.outfit(
+                    color: AppTheme.subtext.withValues(alpha: 0.8),
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                  ),
+                )
+                    .animate(onPlay: (c) => c.repeat(reverse: true))
+                    .fade(begin: 0.4, end: 1, duration: 900.ms),
               ],
             ),
           ),

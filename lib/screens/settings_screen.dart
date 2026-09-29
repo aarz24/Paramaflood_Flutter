@@ -83,15 +83,16 @@ class SettingsScreen extends StatelessWidget {
                 // ── App Info Card ──
                 SliverToBoxAdapter(
                   child: const _InfoCard(
-                    title: 'ABOUT',
+                    title: 'TENTANG APLIKASI',
+                    icon: Icons.info_rounded,
                     children: [
                       _InfoRow(
                           icon: Icons.water_drop_rounded,
-                          label: 'App Name',
+                          label: 'Nama Aplikasi',
                           value: 'ParamaFlood Monitor'),
                       _InfoRow(
                           icon: Icons.tag_rounded,
-                          label: 'Version',
+                          label: 'Versi',
                           value: '2.0.0 (Phase 1)'),
                       _InfoRow(
                           icon: Icons.memory_rounded,
@@ -99,7 +100,7 @@ class SettingsScreen extends StatelessWidget {
                           value: 'ESP32 + Flutter + Firebase'),
                       _InfoRow(
                           icon: Icons.school_rounded,
-                          label: 'Institution',
+                          label: 'Institusi',
                           value: 'Universitas Paramadina'),
                     ],
                   ).animate().fadeIn(delay: 100.ms).slideY(begin: 0.1),
@@ -110,19 +111,20 @@ class SettingsScreen extends StatelessWidget {
                 // ── Team Card ──
                 SliverToBoxAdapter(
                   child: const _InfoCard(
-                    title: 'TEAM',
+                    title: 'TIM PENGEMBANG',
+                    icon: Icons.groups_rounded,
                     children: [
                       _InfoRow(
                           icon: Icons.person_rounded,
-                          label: 'Researcher',
+                          label: 'Peneliti',
                           value: 'Arya'),
                       _InfoRow(
                           icon: Icons.person_rounded,
-                          label: 'Researcher',
+                          label: 'Peneliti',
                           value: 'Aril'),
                       _InfoRow(
                           icon: Icons.person_rounded,
-                          label: 'Researcher',
+                          label: 'Peneliti',
                           value: 'Naina'),
                     ],
                   ).animate().fadeIn(delay: 200.ms).slideY(begin: 0.1),
@@ -135,10 +137,11 @@ class SettingsScreen extends StatelessWidget {
                   child: Consumer<AppState>(
                     builder: (context, state, _) {
                       return _InfoCard(
-                        title: 'DEVICE LOCATION',
+                        title: 'LOKASI PERANGKAT',
+                    icon: Icons.my_location_rounded,
                         action: state.locationDeniedForever
                             ? _ActionButton(
-                                label: 'Open Settings',
+                                label: 'Buka Pengaturan',
                                 icon: Icons.settings_rounded,
                                 onTap: () => state.openAppSettings(),
                               )
@@ -147,7 +150,7 @@ class SettingsScreen extends StatelessWidget {
                                     state.locationName == 'Location Error' ||
                                     state.locationName == 'GPS Timeout')
                                 ? _ActionButton(
-                                    label: 'Retry Location',
+                                    label: 'Coba Lagi Lokasi',
                                     icon: Icons.refresh_rounded,
                                     onTap: () => state.retryLocation(),
                                   )
@@ -155,12 +158,12 @@ class SettingsScreen extends StatelessWidget {
                         children: [
                           _InfoRow(
                             icon: Icons.place_rounded,
-                            label: 'Location',
+                            label: 'Lokasi',
                             value: state.locationName,
                           ),
                           _InfoRow(
                             icon: Icons.sensors_rounded,
-                            label: 'Sensor Status',
+                            label: 'Status Sensor',
                             value: state.live.isOnline
                                 ? 'Online'
                                 : 'Offline',
@@ -184,7 +187,7 @@ class SettingsScreen extends StatelessWidget {
                       .slideY(begin: 0.1),
                 ),
 
-                const SliverToBoxAdapter(child: SizedBox(height: 20)),
+                const SliverToBoxAdapter(child: SizedBox(height: 110)),
               ],
             ),
           ),
@@ -198,46 +201,29 @@ class SettingsScreen extends StatelessWidget {
 class _Header extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.fromLTRB(12, 8, 12, 0),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppTheme.cardSolid,
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: AppTheme.cardBorder),
-        boxShadow: [
-          BoxShadow(
-            color: AppTheme.heroAcc.withValues(alpha: 0.06),
-            blurRadius: 18,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
       child: Row(
         children: [
-          SizedBox(
-            width: 42,
-            height: 42,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Image.asset(
-                'assets/images/splashscreen.jpg',
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Image.asset(
-                    'assets/images/splashscreen.png',
-                    fit: BoxFit.cover,
-                    errorBuilder: (ctx, err, st) {
-                      return const Icon(
-                        Icons.settings_rounded,
-                        color: AppTheme.heroAcc,
-                        size: 22,
-                      );
-                    },
-                  );
-                },
+          Container(
+            width: 46,
+            height: 46,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(14),
+              gradient: const LinearGradient(
+                colors: [AppTheme.colPres, AppTheme.heroAcc],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
+              boxShadow: [
+                BoxShadow(
+                  color: AppTheme.colPres.withValues(alpha: 0.22),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
+            child: const Icon(Icons.tune_rounded, color: Colors.white, size: 24),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -245,21 +231,16 @@ class _Header extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Settings',
+                  'Pengaturan',
                   style: GoogleFonts.outfit(
                     color: AppTheme.text,
-                    fontSize: 18,
+                    fontSize: 19,
                     fontWeight: FontWeight.w800,
-                    letterSpacing: 0.3,
                   ),
                 ),
-                const SizedBox(height: 2),
                 Text(
-                  'App info, location, and configuration',
-                  style: GoogleFonts.outfit(
-                    color: AppTheme.subtext,
-                    fontSize: 11,
-                  ),
+                  'Akun, notifikasi, lokasi, dan info aplikasi',
+                  style: GoogleFonts.outfit(color: AppTheme.subtext, fontSize: 11),
                 ),
               ],
             ),
@@ -275,18 +256,20 @@ class _InfoCard extends StatelessWidget {
   final String title;
   final List<_InfoRow> children;
   final Widget? action;
+  final IconData icon;
 
   const _InfoCard({
     required this.title,
     required this.children,
     this.action,
+    this.icon = Icons.info_rounded,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 12),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
       decoration: BoxDecoration(
         color: AppTheme.cardSolid,
         borderRadius: BorderRadius.circular(20),
@@ -302,20 +285,29 @@ class _InfoCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: GoogleFonts.outfit(
-              color: AppTheme.heroAcc,
-              fontSize: 10,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 2,
-            ),
+          Row(
+            children: [
+              Icon(icon, color: AppTheme.heroAcc, size: 16),
+              const SizedBox(width: 8),
+              Text(
+                title,
+                style: GoogleFonts.outfit(
+                  color: AppTheme.heroAcc,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1.6,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 12),
-          ...children.map((row) => Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: row,
-              )),
+          const SizedBox(height: 10),
+          for (var i = 0; i < children.length; i++) ...[
+            if (i > 0) const Divider(height: 1, color: AppTheme.divider),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 9),
+              child: children[i],
+            ),
+          ],
           if (action != null) ...[
             const SizedBox(height: 4),
             action!,
@@ -344,7 +336,14 @@ class _InfoRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(icon, color: AppTheme.subtext.withValues(alpha: 0.6), size: 16),
+        Container(
+          padding: const EdgeInsets.all(6),
+          decoration: BoxDecoration(
+            color: AppTheme.heroAcc.withValues(alpha: 0.08),
+            borderRadius: BorderRadius.circular(9),
+          ),
+          child: Icon(icon, color: AppTheme.heroAcc, size: 15),
+        ),
         const SizedBox(width: 10),
         Text(
           label,
@@ -353,10 +352,11 @@ class _InfoRow extends StatelessWidget {
             fontSize: 12,
           ),
         ),
-        const Spacer(),
-        Flexible(
+        const SizedBox(width: 12),
+        Expanded(
           child: Text(
             value,
+            maxLines: 2,
             style: GoogleFonts.outfit(
               color: valueColor ?? AppTheme.text,
               fontSize: 12,
@@ -417,20 +417,20 @@ class _ActionButton extends StatelessWidget {
 // ─── Phase 2 preview card ────────────────────────────────────────────
 class _Phase2Card extends StatelessWidget {
   static const _upcoming = [
-    (Icons.notifications_active_rounded, 'Push Notifications',
-        'Real-time flood alerts via FCM'),
-    (Icons.psychology_rounded, 'LSTM Predictions',
-        'AI-powered water level forecasting'),
-    (Icons.download_rounded, 'Data Export',
-        'Export history to CSV / PDF'),
-    (Icons.translate_rounded, 'Bahasa Indonesia',
-        'Full app localization'),
+    (Icons.notifications_active_rounded, 'Notifikasi Push',
+        'Peringatan banjir real-time via FCM'),
+    (Icons.psychology_rounded, 'Prediksi LSTM',
+        'Prakiraan ketinggian air berbasis AI'),
+    (Icons.download_rounded, 'Ekspor Data',
+        'Ekspor riwayat ke CSV / PDF'),
+    (Icons.translate_rounded, 'Multi Bahasa',
+        'Pilihan bahasa Indonesia & Inggris'),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 12),
+      margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppTheme.cardSolid,
@@ -450,7 +450,7 @@ class _Phase2Card extends StatelessWidget {
           Row(
             children: [
               Text(
-                'COMING IN PHASE 2',
+                'SEGERA HADIR · FASE 2',
                 style: GoogleFonts.outfit(
                   color: AppTheme.heroAcc,
                   fontSize: 10,
@@ -467,7 +467,7 @@ class _Phase2Card extends StatelessWidget {
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Text(
-                  'NEXT SEMESTER',
+                  'SEMESTER DEPAN',
                   style: GoogleFonts.outfit(
                     color: AppTheme.heroAcc,
                     fontSize: 8,
@@ -539,7 +539,7 @@ class _CampusAccountCard extends StatelessWidget {
     final photoUrl = state.userPhotoUrl;
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 12),
+      margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppTheme.cardSolid,
@@ -807,7 +807,7 @@ class _NotificationTestCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 12),
+      margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppTheme.cardSolid,
